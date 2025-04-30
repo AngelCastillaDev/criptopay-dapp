@@ -1,0 +1,101 @@
+/* Estilos para el dropdown de redes */
+.dropdown-enter-active,
+.dropdown-leave-active {
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.dropdown-enter,
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Estilos para el indicador de red activa */
+.network-indicator {
+    transition: background-color 0.3s ease;
+}
+
+/* Animación para el cambio de red */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.network-changed {
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* Estilos para las notificaciones */
+.notification {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    max-width: 300px;
+    transform: translateX(100%);
+    animation: slide-in 0.3s forwards;
+}
+
+.notification-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.notification-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.notification-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.notification-icon {
+    margin-right: 12px;
+}
+
+.notification-message {
+    flex: 1;
+}
+
+.notification-close {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+@keyframes slide-in {
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slide-out {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.notification-exit {
+    animation: slide-out 0.3s forwards;
+}

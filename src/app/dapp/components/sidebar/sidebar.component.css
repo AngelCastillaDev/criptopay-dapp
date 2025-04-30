@@ -1,0 +1,35 @@
+/* Estilos para el dropdown de redes */
+.dropdown-enter-active,
+.dropdown-leave-active {
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.dropdown-enter,
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Estilos para el indicador de red activa */
+.network-indicator {
+    transition: background-color 0.3s ease;
+}
+
+/* Animación para el cambio de red */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.network-changed {
+    animation: pulse 0.5s ease-in-out;
+}

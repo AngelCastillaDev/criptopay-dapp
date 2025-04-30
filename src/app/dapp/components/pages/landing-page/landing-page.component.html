@@ -1,0 +1,168 @@
+<div class="min-h-screen flex flex-col bg-gray-950 text-white overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500 rounded-full filter blur-3xl animate-pulse">
+            </div>
+            <div class="absolute top-3/4 right-1/4 w-64 h-64 bg-indigo-600 rounded-full filter blur-3xl animate-pulse"
+                style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-1/4 left-1/2 w-80 h-80 bg-purple-700 rounded-full filter blur-3xl animate-pulse"
+                style="animation-delay: 4s;"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="container mx-auto px-4 py-6 flex justify-between items-center relative z-10">
+        <div class="flex items-center group cursor-pointer">
+            <img src="../../../../assets/criptopay.png" alt="CriptoPay Logo"
+                class="h-12 w-12 mr-3 transition-transform duration-500 group-hover:rotate-12" />
+            <h1 class="text-2xl font-bold text-cyan-400">
+                CriptoPay
+            </h1>
+        </div>
+        <button (click)="showLoginModal = true"
+            class="relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+            Iniciar sesión
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-12 md:py-24 relative z-10">
+        <div class="max-w-4xl mx-auto">
+            <!-- Hero Section with Animation -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
+                    Bienvenido a CriptoPay
+                </h2>
+                <h3 class="text-2xl md:text-3xl font-light mb-8 text-cyan-400">
+                    Tu billetera descentralizada
+                </h3>
+                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800">
+                    <p class="text-lg md:text-xl text-white leading-relaxed">
+                        CriptoPay es tu billetera digital descentralizada que permite enviar y recibir Ether de manera
+                        rápida y segura.
+                        Podrás generar códigos QR para recibir pagos, escanear códigos para pagar fácilmente, mantener
+                        un historial
+                        de tus transacciones y gestionar tus contactos sin complicaciones.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Features Section with Animations -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                <div>
+                    <div
+                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                        <div
+                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3
+                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                            Seguridad Garantizada</h3>
+                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Tus
+                            claves privadas nunca salen de tu dispositivo. Mantenemos los más altos
+                            estándares de seguridad para proteger tus activos digitales.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div
+                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                        <div
+                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3
+                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                            Transacciones Rápidas</h3>
+                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                            Envía y recibe criptomonedas en segundos. Sin esperas, sin complicaciones.
+                            Experimenta la velocidad de las transacciones blockchain.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div
+                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                        <div
+                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3
+                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                            Control Total</h3>
+                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Tú
+                            tienes el control absoluto de tus fondos. Sin intermediarios, sin
+                            restricciones. La verdadera libertad financiera en tus manos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="text-4xl font-bold text-cyan-400 mb-2">+100K</div>
+                    <div class="text-white">Usuarios activos</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="text-4xl font-bold text-cyan-400 mb-2">$10M+</div>
+                    <div class="text-white">Transacciones diarias</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="text-4xl font-bold text-cyan-400 mb-2">99.9%</div>
+                    <div class="text-white">Tiempo de actividad</div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="mt-24 text-center">
+                <button (click)="showLoginModal = true"
+                    class="relative overflow-hidden bg-cyan-600 hover:bg-cyan-700 text-white px-10 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105">
+                    Comenzar Ahora
+                </button>
+                <p class="mt-6 text-gray-300">Únete a miles de usuarios que ya confían en CriptoPay</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-8 mt-auto border-t border-gray-800 relative z-10">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <div class="flex items-center">
+                    <img src="../../../../assets/criptopay.png" alt="CriptoPay Logo" class="h-8 w-8 mr-2" />
+                    <span class="text-xl font-bold text-cyan-400">CriptoPay</span>
+                </div>
+            </div>
+            <div class="flex space-x-6 mb-4 md:mb-0">
+                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Términos</a>
+                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Privacidad</a>
+                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Soporte</a>
+            </div>
+            <div class="text-gray-300 text-sm">
+                <p>© 2025 CriptoPay. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <app-login-modal *ngIf="showLoginModal" (close)="showLoginModal = false"
+        (selectBlockchain)="onSelectBlockchain($event)"></app-login-modal>
+
+    <!-- Wallet Modal -->
+    <app-wallet-modal *ngIf="showWalletModal" [blockchain]="selectedBlockchain" (close)="showWalletModal = false"
+        (selectWallet)="onSelectWallet($event)"></app-wallet-modal>
+</div>

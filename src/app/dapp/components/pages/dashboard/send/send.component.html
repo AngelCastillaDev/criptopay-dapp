@@ -1,0 +1,423 @@
+<div class="max-w-2xl mx-auto p-4">
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                Enviar Pago
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                Envía {{ symbol }} a otra dirección.
+            </p>
+        </div>
+
+        <!-- Pestañas para seleccionar método -->
+        <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="flex border-b border-gray-200 dark:border-gray-700">
+                <button (click)="showScanner = false; showConfirmation = false; stopScanner()"
+                    class="px-4 py-2 text-sm font-medium border-b-2 focus:outline-none"
+                    [ngClass]="!showScanner ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'">
+                    Manual
+                </button>
+                <button (click)="toggleScanner()" class="px-4 py-2 text-sm font-medium border-b-2 focus:outline-none"
+                    [ngClass]="showScanner ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'">
+                    Escanear QR
+                </button>
+            </div>
+
+            <!-- Escáner QR -->
+            <div *ngIf="showScanner" class="px-4 py-5 sm:p-6">
+                <div class="flex flex-col items-center space-y-4">
+                    <!-- Mensaje de error de permisos de cámara -->
+                    <div *ngIf="cameraPermissionDenied"
+                        class="w-full max-w-sm bg-red-50 dark:bg-red-900 p-4 rounded-md border border-red-200 dark:border-red-800">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                    Permiso de cámara denegado
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                    <p>Para escanear códigos QR, debes permitir el acceso a la cámara.</p>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="button" (click)="requestCameraPermission()"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        Permitir acceso a la cámara
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de error general del escáner -->
+                    <div *ngIf="scannerError && !cameraPermissionDenied"
+                        class="w-full max-w-sm bg-yellow-50 dark:bg-yellow-900 p-4 rounded-md border border-yellow-200 dark:border-yellow-800">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                    Error en el escáner
+                                </h3>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>{{ scannerError }}</p>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="button" (click)="initScanner()"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                        Reintentar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor del escáner QR con guía de escaneo -->
+                    <div class="w-full max-w-sm relative" [class.hidden]="cameraPermissionDenied || scannerError">
+                        <div id="qr-reader" class="w-full"></div>
+
+                        <!-- Guía de escaneo -->
+                        <div *ngIf="scanGuideVisible && isScanning" class="qr-scan-guide">
+                            <div class="qr-scan-border"></div>
+                            <div class="qr-scan-message">
+                                Centra el código QR en el recuadro
+                            </div>
+                        </div>
+
+                        <!-- Botón para mostrar/ocultar guía -->
+                        <button *ngIf="isScanning" (click)="toggleScanGuide()"
+                            class="absolute top-2 right-2 bg-gray-800 bg-opacity-50 text-white p-1 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path *ngIf="scanGuideVisible" fill-rule="evenodd"
+                                    d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-14-14z"
+                                    clip-rule="evenodd" />
+                                <path *ngIf="scanGuideVisible" fill-rule="evenodd"
+                                    d="M16.707 2.293a1 1 0 011.414 1.414l-14 14a1 1 0 01-1.414-1.414l14-14z"
+                                    clip-rule="evenodd" />
+                                <path *ngIf="!scanGuideVisible" d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path *ngIf="!scanGuideVisible" fill-rule="evenodd"
+                                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Selector de cámara -->
+                    <div *ngIf="availableCameras.length > 1 && !cameraPermissionDenied && !scannerError"
+                        class="w-full max-w-sm">
+                        <label for="camera-select"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Seleccionar cámara
+                        </label>
+                        <select id="camera-select" [(ngModel)]="cameraId" (change)="changeCamera(cameraId)"
+                            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option *ngFor="let camera of availableCameras" [value]="camera.id">{{ camera.label ||
+                                'Cámara ' + camera.id }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Opción para subir imagen -->
+                    <div class="w-full max-w-sm">
+                        <div class="flex items-center justify-center">
+                            <span class="text-sm text-gray-500 dark:text-gray-400 mr-2">o</span>
+                        </div>
+                        <div class="mt-2">
+                            <input #fileSelector type="file" accept="image/*" class="hidden"
+                                (change)="handleFileInput($event)" />
+                            <button type="button" (click)="openFileSelector()" [disabled]="isProcessingImage"
+                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg *ngIf="!isProcessingImage" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <svg *ngIf="isProcessingImage" class="animate-spin h-5 w-5 mr-2"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                {{ isProcessingImage ? 'Procesando imagen...' : 'Subir imagen con código QR' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <p *ngIf="!cameraPermissionDenied && !scannerError"
+                        class="text-sm text-gray-500 dark:text-gray-400">
+                        Apunta la cámara al código QR para escanear automáticamente
+                    </p>
+                </div>
+            </div>
+
+            <!-- Entrada manual de código -->
+            <div *ngIf="!showScanner && !showConfirmation" class="px-4 py-5 sm:p-6">
+                <div class="space-y-6">
+                    <!-- Opción 1: Ingresar código de pago -->
+                    <div>
+                        <label for="payment-code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Código de pago
+                        </label>
+                        <div class="mt-1">
+                            <input type="text" name="payment-code" id="payment-code" [(ngModel)]="manualCode"
+                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
+                                placeholder="ethereum:0x..." />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Ingresa un código de pago en formato ethereum:0x...
+                        </p>
+                        <div class="mt-2">
+                            <button type="button" (click)="processManualCode()"
+                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Procesar código
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div class="relative flex justify-center">
+                            <span
+                                class="px-2 bg-white dark:bg-gray-800 text-sm text-gray-500 dark:text-gray-400">o</span>
+                        </div>
+                    </div>
+
+                    <!-- Opción 2: Formulario tradicional -->
+                    <form (submit)="sendTransaction($event)">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="recipient"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Dirección del Destinatario
+                                </label>
+                                <div class="mt-1">
+                                    <input type="text" name="recipient" id="recipient" [(ngModel)]="recipientAddress"
+                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
+                                        placeholder="0x..." required />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Cantidad ({{ symbol }})
+                                </label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <input type="number" name="amount" id="amount" [(ngModel)]="amount"
+                                        class="focus:ring-blue-500 focus:border-blue-500 block w-full pr-12 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
+                                        placeholder="0.00" step="0.001" min="0" required />
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">
+                                            {{ symbol }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="gas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Gas (Gwei)
+                                </label>
+                                <div class="mt-1">
+                                    <input type="number" name="gas" id="gas" [(ngModel)]="gasPrice"
+                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
+                                        placeholder="21" value="21" required />
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Balance disponible: {{ balance }} {{ symbol }}
+                                </div>
+                                <button type="submit" [disabled]="isLoading || !isValidAmount()"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                    Enviar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pantalla de confirmación -->
+            <div *ngIf="showConfirmation" class="px-4 py-5 sm:p-6">
+                <div class="space-y-6">
+                    <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                    Confirmar pago
+                                </h3>
+                                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                                    <p>Por favor revisa los detalles del pago antes de confirmar.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerta de red incorrecta -->
+                    <div *ngIf="networkMismatch"
+                        class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                    Red incorrecta
+                                </h3>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>Este pago debe realizarse en la red <strong>{{ scannedNetwork || 'especificada en
+                                            el código' }}</strong>, pero estás conectado a <strong>{{ network
+                                            }}</strong>.</p>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="button" (click)="switchToScannedNetwork()"
+                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                        Cambiar a {{ scannedNetwork || 'la red correcta' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Destinatario</h4>
+                                <p class="mt-1 text-sm text-gray-900 dark:text-white font-mono break-all">{{
+                                    recipientAddress }}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Cantidad</h4>
+                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ amount }} {{ scannedSymbol ||
+                                    symbol }}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Red</h4>
+                                <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                    {{ scannedNetwork || network }}
+                                    <span *ngIf="networkMismatch" class="text-yellow-500 ml-2">(Red incorrecta)</span>
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Gas (Gwei)</h4>
+                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ gasPrice }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button type="button" (click)="showConfirmation = false"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </button>
+                        <button type="button" (click)="sendTransaction()"
+                            [disabled]="isLoading || !isValidAmount() || networkMismatch"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            Confirmar y enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de transacción exitosa -->
+    <div *ngIf="transactionHash"
+        class="mt-6 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+                    Transacción enviada
+                </h3>
+                <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                    <p>Hash de la transacción: {{ transactionHash | slice:0:10 }}...{{ transactionHash | slice:-6 }}</p>
+                </div>
+                <div class="mt-4">
+                    <div class="-mx-2 -my-1.5 flex">
+                        <a [href]="getBlockExplorer() + transactionHash" target="_blank"
+                            class="bg-green-100 dark:bg-green-800 px-2 py-1.5 rounded-md text-sm font-medium text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Ver en explorador
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="errorMessage"
+        class="mt-6 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                    Error en la transacción
+                </h3>
+                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                    <p>{{ errorMessage }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

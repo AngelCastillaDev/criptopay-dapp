@@ -1,0 +1,103 @@
+/* Animaciones personalizadas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+}
+
+.animate-pulse {
+    animation: pulse 8s infinite ease-in-out;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Mejoras para accesibilidad */
+:focus {
+    outline: 2px solid rgba(6, 182, 212, 0.6);
+    outline-offset: 2px;
+}
+
+/* Estilos para scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #06b6d4;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0891b2;
+}
+
+/* Asegurarse de que el texto sea visible */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+button,
+span {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-gray-300 {
+    color: #d1d5db !important;
+}
+
+/* Añadir un poco de espacio entre elementos para mejor legibilidad */
+p {
+    margin-bottom: 1rem;
+}
+
+/* Asegurar que los fondos de las tarjetas tengan suficiente opacidad */
+.bg-gray-900 {
+    background-color: rgba(17, 24, 39, 0.95) !important;
+}
+
+/* Añadir un borde más visible a las tarjetas */
+.border-gray-800 {
+    border-color: #1f2937 !important;
+    border-width: 2px !important;
+}
