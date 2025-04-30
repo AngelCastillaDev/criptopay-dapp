@@ -1,0 +1,120 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"name": "PaymentSent",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address payable",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "sendPayment",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Angel Castilla",
+			"details": "Utiliza eventos para registrar cada transacción de envío de ETH.",
+			"events": {
+				"PaymentSent(address,address,uint256,uint256)": {
+					"params": {
+						"amount": "Cantidad enviada en wei.",
+						"from": "Dirección del remitente.",
+						"timestamp": "Momento en que se realizó el pago.",
+						"to": "Dirección del destinatario."
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"sendPayment(address)": {
+					"details": "Requiere que el monto enviado sea mayor a 0 wei.",
+					"params": {
+						"recipient": "La dirección que recibirá el pago."
+					}
+				}
+			},
+			"title": "CriptoPay",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"PaymentSent(address,address,uint256,uint256)": {
+					"notice": "Evento que registra cuando se envía un pago."
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"sendPayment(address)": {
+					"notice": "Envía un pago de ETH a un destinatario especificado."
+				}
+			},
+			"notice": "Permite enviar pagos en ETH directamente entre usuarios.",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/CriptoPay.sol": "CriptoPay"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/CriptoPay.sol": {
+			"keccak256": "0xd2d53c259d552924733e4d6022873056a6469b0d0e4b0c1a7a386dc4babdc4e7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0248f2f3930eeb5c89290e190d3a7ef641ec638ded32a3361b41ed24340a0bbd",
+				"dweb:/ipfs/Qmcrrkv2fx11B4NpUJnqLUYZUsAwXeEuAES2ZqFBwjNwTB"
+			]
+		}
+	},
+	"version": 1
+}

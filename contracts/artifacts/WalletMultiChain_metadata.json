@@ -1,0 +1,175 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "payable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "DepositoRecibido",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "TransferenciaRealizada",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "donar",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address payable",
+						"name": "destinatario",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "monto",
+						"type": "uint256"
+					}
+				],
+				"name": "enviarETH",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "verBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
+			}
+		],
+		"devdoc": {
+			"details": "Asegúrate de enviar fondos al contrato antes de intentar transferir.",
+			"kind": "dev",
+			"methods": {
+				"constructor": {
+					"details": "Constructor, se ejecuta una vez al desplegar y define al owner."
+				},
+				"enviarETH(address,uint256)": {
+					"params": {
+						"destinatario": "Dirección que recibirá el ETH.",
+						"monto": "Monto a enviar en wei."
+					}
+				}
+			},
+			"title": "WalletMultiChain",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"DepositoRecibido(address,uint256)": {
+					"notice": "Emite un evento cuando el contrato recibe ETH"
+				},
+				"TransferenciaRealizada(address,uint256)": {
+					"notice": "Emite un evento cuando se transfiere ETH a otra cuenta"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"donar()": {
+					"notice": "Permite que cualquiera pueda enviar ETH como donación al contrato."
+				},
+				"enviarETH(address,uint256)": {
+					"notice": "Permite al owner enviar ETH desde el contrato a otra dirección."
+				},
+				"verBalance()": {
+					"notice": "Ver el saldo total del contrato."
+				}
+			},
+			"notice": "Permite recibir y enviar ETH desde este contrato en redes compatibles como Ethereum, Holesky, etc.",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/WalletMultiChain.sol": "WalletMultiChain"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/WalletMultiChain.sol": {
+			"keccak256": "0xf16179b28da6eee978c973b01c9bf79f1cf0631a31f7d39382c3e5427468a5e7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8ff832f060a99ae63d1cad0749707c0aa5b3c405708e63fe46baffd166604c54",
+				"dweb:/ipfs/QmVyxARFCfZXghnKGRKWwDz7CkLPe3BKy2pH2EvKfKHTau"
+			]
+		}
+	},
+	"version": 1
+}
