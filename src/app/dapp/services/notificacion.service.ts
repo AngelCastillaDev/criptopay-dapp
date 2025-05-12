@@ -46,6 +46,10 @@ export class NotificationService {
             this.renderer.addClass(container, "top-4")
             this.renderer.addClass(container, "right-4")
             this.renderer.addClass(container, "z-50")
+            this.renderer.addClass(container, "flex")
+            this.renderer.addClass(container, "flex-col")
+            this.renderer.addClass(container, "items-end")
+            this.renderer.addClass(container, "space-y-2")
             this.renderer.appendChild(document.body, container)
         }
 
@@ -63,6 +67,37 @@ export class NotificationService {
         this.renderer.setStyle(notification, "align-items", "center")
         this.renderer.setStyle(notification, "max-width", "300px")
         this.renderer.setStyle(notification, "animation", "slide-in 0.3s forwards")
+        this.renderer.setStyle(notification, "transform", "translateX(100%)")
+        this.renderer.setStyle(notification, "opacity", "0")
+
+        // Crear animación de entrada
+        const keyframes = `
+            @keyframes slide-in {
+                0% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slide-out {
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `
+
+        // Agregar estilos al documento
+        const style = document.createElement("style")
+        style.innerHTML = keyframes
+        document.head.appendChild(style)
 
         // Aplicar colores según el tipo
         switch (type) {
@@ -115,6 +150,7 @@ export class NotificationService {
         this.renderer.addClass(closeDiv, "notification-close")
         this.renderer.setStyle(closeDiv, "cursor", "pointer")
         this.renderer.setStyle(closeDiv, "opacity", "0.7")
+        this.renderer.setStyle(closeDiv, "margin-left", "12px")
         closeDiv.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -126,6 +162,9 @@ export class NotificationService {
         this.renderer.appendChild(notification, messageDiv)
         this.renderer.appendChild(notification, closeDiv)
         this.renderer.appendChild(container, notification)
+
+        // Aplicar animación de entrada
+        this.renderer.setStyle(notification, "animation", "slide-in 0.3s forwards")
 
         // Configurar el botón de cierre
         closeDiv.addEventListener("click", () => {

@@ -1,166 +1,284 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
-import { ethers } from "ethers";
+import { BrowserProvider, formatEther } from "ethers";
+import { Router } from "@angular/router";
 
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum: any;
   }
-}
-
-export interface NetworkInfo {
-  name: string;
-  chainId: string;
-  rpcUrl?: string;
-  symbol?: string;
-  blockExplorer?: string;
 }
 
 @Injectable({
   providedIn: "root",
 })
 export class WalletService {
-  private provider: ethers.BrowserProvider | null = null;
-  private signer: ethers.JsonRpcSigner | null = null;
-
-  private isConnectedSubject = new BehaviorSubject<boolean>(false);
-  private accountSubject = new BehaviorSubject<string | null>(null);
+  private accountSubject = new BehaviorSubject<string>("");
   private balanceSubject = new BehaviorSubject<string>("0");
   private networkSubject = new BehaviorSubject<string>("Desconocida");
-  private chainIdSubject = new BehaviorSubject<string>("");
+  private provider: BrowserProvider | null = null;
+  private isConnectedSubject = new BehaviorSubject<boolean>(false);
+  private isConnectingSubject = new BehaviorSubject<boolean>(false);
+  private isCheckingConnectionSubject = new BehaviorSubject<boolean>(true);
 
-  isConnected$ = this.isConnectedSubject.asObservable();
   account$ = this.accountSubject.asObservable();
   balance$ = this.balanceSubject.asObservable();
   network$ = this.networkSubject.asObservable();
-  chainId$ = this.chainIdSubject.asObservable();
+  isConnected$ = this.isConnectedSubject.asObservable();
+  isConnecting$ = this.isConnectingSubject.asObservable();
+  isCheckingConnection$ = this.isCheckingConnectionSubject.asObservable();
 
-  availableNetworks: NetworkInfo[] = [
-    { name: "Ethereum Mainnet", chainId: "0x1", symbol: "ETH", blockExplorer: "https://etherscan.io" },
-    { name: "Sepolia Testnet", chainId: "0xaa36a7", rpcUrl: "https://sepolia.infura.io/v3/", symbol: "ETH", blockExplorer: "https://sepolia.etherscan.io" },
-    { name: "Goerli Testnet", chainId: "0x5", rpcUrl: "https://goerli.infura.io/v3/", symbol: "ETH", blockExplorer: "https://goerli.etherscan.io" },
-    { name: "Holesky Testnet", chainId: "0x4268", rpcUrl: "https://ethereum-holesky.publicnode.com", symbol: "ETH", blockExplorer: "https://holesky.etherscan.io" },
-    { name: "Polygon Mainnet", chainId: "0x89", rpcUrl: "https://polygon-rpc.com", symbol: "MATIC", blockExplorer: "https://polygonscan.com" },
-    { name: "Polygon Mumbai", chainId: "0x13881", rpcUrl: "https://rpc-mumbai.maticvigil.com", symbol: "MATIC", blockExplorer: "https://mumbai.polygonscan.com" },
-  ];
+  constructor(private router: Router) {
+    // Verificar la conexión al iniciar el servicio
+    this.checkConnection();
 
-  constructor() {
-    this.setupEventListeners();
-    if (localStorage.getItem("walletConnected") === "true") {
-      this.checkConnection();
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          this.disconnect();
+        } else {
+          this.accountSubject.next(accounts[0]);
+          this.updateBalance(accounts[0]);
+        }
+      });
+
+      // Mejorar el manejo del evento chainChanged
+      window.ethereum.on("chainChanged", async (chainId: string) => {
+        console.log("Chain changed to:", chainId);
+        this.updateNetworkName(chainId);
+
+        // Recrear el provider con la nueva cadena
+        this.provider = new BrowserProvider(window.ethereum);
+
+        // Obtener la cuenta actual y actualizar el balance
+        const currentAccount = this.accountSubject.getValue();
+        if (currentAccount) {
+          console.log("Updating balance for account:", currentAccount);
+          // Esperar un momento para que la red se actualice completamente
+          setTimeout(async () => {
+            await this.updateBalance(currentAccount);
+          }, 1000);
+        }
+      });
     }
   }
 
-  private setupEventListeners() {
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", async () => await this.initProvider());
-      window.ethereum.on("chainChanged", async () => await this.initProvider());
-      window.ethereum.on("disconnect", () => this.disconnect());
+  private async checkConnection() {
+    this.isCheckingConnectionSubject.next(true);
+
+    try {
+      if (localStorage.getItem("walletConnected") === "true" && window.ethereum) {
+        console.log("Checking existing wallet connection...");
+
+        try {
+          this.provider = new BrowserProvider(window.ethereum);
+
+          // Verificar si MetaMask está desbloqueado y tenemos acceso a las cuentas
+          const accounts = await this.provider.send("eth_accounts", []);
+
+          if (accounts.length > 0) {
+            console.log("Wallet reconnected successfully:", accounts[0]);
+
+            // Obtener la cadena actual
+            const chainId = await this.provider.send("eth_chainId", []);
+            this.updateNetworkName(chainId);
+
+            // Actualizar el estado de la conexión
+            this.accountSubject.next(accounts[0]);
+            this.isConnectedSubject.next(true);
+
+            // Actualizar el balance
+            await this.updateBalance(accounts[0]);
+
+            return true;
+          } else {
+            console.log("No accounts found, wallet is locked or permission was denied");
+            localStorage.removeItem("walletConnected");
+            this.isConnectedSubject.next(false);
+            return false;
+          }
+        } catch (error) {
+          console.error("Failed to reconnect wallet:", error);
+          localStorage.removeItem("walletConnected");
+          this.isConnectedSubject.next(false);
+          return false;
+        }
+      } else {
+        console.log("No previous wallet connection found");
+        this.isConnectedSubject.next(false);
+        return false;
+      }
+    } finally {
+      this.isCheckingConnectionSubject.next(false);
     }
   }
 
   async connect(): Promise<string> {
-    if (!window.ethereum) throw new Error("MetaMask no está instalado");
+    if (!window.ethereum) {
+      throw new Error("MetaMask no está instalado");
+    }
 
     try {
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      await this.initProvider();
+      this.isConnectingSubject.next(true);
+      this.provider = new BrowserProvider(window.ethereum);
+
+      // This will trigger the MetaMask popup
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      if (accounts.length === 0) {
+        throw new Error("No se seleccionó ninguna cuenta");
+      }
+
+      const account = accounts[0];
+      this.accountSubject.next(account);
+      this.isConnectedSubject.next(true);
       localStorage.setItem("walletConnected", "true");
-      return this.accountSubject.getValue() || "";
-    } catch (error) {
-      console.error("Error conectando con MetaMask:", error);
+
+      // Get current chain ID
+      const chainId = await this.provider.send("eth_chainId", []);
+      this.updateNetworkName(chainId);
+
+      await this.updateBalance(account);
+
+      return account;
+    } catch (error: any) {
+      console.error("Error connecting to MetaMask:", error);
+      this.isConnectedSubject.next(false);
+      localStorage.removeItem("walletConnected");
       throw error;
+    } finally {
+      this.isConnectingSubject.next(false);
     }
   }
 
-  private async initProvider() {
-    this.provider = new ethers.BrowserProvider(window.ethereum);
-    this.signer = await this.provider.getSigner();
-    const address = await this.signer.getAddress();
-    const balance = await this.provider.getBalance(address);
-    const network = await this.provider.getNetwork();
+  async disconnect() {
+    this.accountSubject.next("");
+    this.balanceSubject.next("0");
+    this.isConnectedSubject.next(false);
+    localStorage.removeItem("walletConnected");
 
-    this.accountSubject.next(address);
-    this.balanceSubject.next(Number(ethers.formatEther(balance)).toFixed(6));
-    this.chainIdSubject.next(`0x${network.chainId.toString(16)}`);
-    this.networkSubject.next(this.getNetworkName(`0x${network.chainId.toString(16)}`));
-    this.isConnectedSubject.next(true);
+    // Redirigir al inicio después de desconectar
+    this.router.navigate(["/"]);
   }
 
-  private getNetworkName(chainId: string): string {
-    const found = this.availableNetworks.find((net) => net.chainId === chainId);
-    if (found) return found.name;
+  private async updateBalance(account: string) {
+    if (!this.provider || !account) {
+      console.log("No provider or account available to update balance");
+      return;
+    }
+
+    try {
+      console.log("Fetching balance for account:", account);
+      // Reintentar hasta 3 veces en caso de error
+      let attempts = 0;
+      let success = false;
+      let formatted = "0";
+
+      while (attempts < 3 && !success) {
+        try {
+          // Recrear el provider para asegurarnos de que está actualizado con la red actual
+          this.provider = new BrowserProvider(window.ethereum);
+
+          // Obtener el balance
+          const balance = await this.provider.getBalance(account);
+          formatted = parseFloat(formatEther(balance)).toFixed(4);
+          console.log("Balance fetched:", formatted, "ETH");
+          success = true;
+        } catch (error) {
+          console.error(`Error fetching balance (attempt ${attempts + 1}):`, error);
+          attempts++;
+          // Esperar un poco antes de reintentar
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      // Si después de los intentos tenemos un balance, actualizarlo
+      if (success) {
+        this.balanceSubject.next(formatted);
+      } else {
+        console.error("Failed to fetch balance after multiple attempts");
+        // No actualizamos el balance para mantener el valor anterior
+      }
+    } catch (error) {
+      console.error("Error in updateBalance:", error);
+      // No actualizamos el balance para mantener el valor anterior
+    }
+  }
+
+  private updateNetworkName(chainId: string): void {
+    let networkName = "Desconocida";
 
     switch (chainId) {
-      case "0x3": return "Ropsten Testnet";
-      case "0x4": return "Rinkeby Testnet";
-      case "0x7a69": return "Hardhat / Localhost";
-      default: return `Red #${parseInt(chainId, 16)}`;
+      case "0x1": // Ethereum Mainnet
+        networkName = "Ethereum";
+        break;
+      case "0xaa36a7": // Sepolia
+        networkName = "Sepolia";
+        break;
+      case "0x5": // Goerli
+        networkName = "Goerli";
+        break;
+      case "0x4268": // Holesky
+        networkName = "Holesky";
+        break;
+      case "0x89": // Polygon
+        networkName = "Polygon";
+        break;
+      case "0x13881": // Mumbai
+        networkName = "Mumbai";
+        break;
     }
+
+    console.log("Network updated to:", networkName);
+    this.networkSubject.next(networkName);
   }
 
-  async checkConnection() {
-    if (!window.ethereum) return;
-    const accounts = await window.ethereum.request({ method: "eth_accounts" });
-    if (accounts.length > 0) {
-      await this.initProvider();
-    }
-  }
-
-  disconnect() {
-    this.provider = null;
-    this.signer = null;
-    this.accountSubject.next(null);
-    this.isConnectedSubject.next(false);
-    this.balanceSubject.next("0");
-    this.networkSubject.next("Desconocida");
-    this.chainIdSubject.next("");
-    localStorage.removeItem("walletConnected");
-  }
-
-  async sendTransaction(to: string, amountEth: string): Promise<string> {
-    if (!this.signer) throw new Error("No hay sesión activa");
-
-    const tx = await this.signer.sendTransaction({
-      to,
-      value: ethers.parseEther(amountEth),
-    });
-
-    return tx.hash;
-  }
-
-  async switchNetwork(chainId: string) {
+  async switchNetwork(chainId: string): Promise<void> {
     if (!window.ethereum) throw new Error("MetaMask no está instalado");
 
     try {
+      console.log("Switching to network with chainId:", chainId);
+
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId }],
       });
-      return true;
+
+      // La actualización del nombre de la red y el balance se manejará 
+      // automáticamente a través del evento chainChanged
+
     } catch (error: any) {
+      console.error("Error switching network:", error);
       if (error.code === 4902) {
-        const network = this.availableNetworks.find((n) => n.chainId === chainId);
-        if (network && network.rpcUrl) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: network.chainId,
-              chainName: network.name,
-              nativeCurrency: {
-                name: network.symbol,
-                symbol: network.symbol,
-                decimals: 18,
-              },
-              rpcUrls: [network.rpcUrl],
-              blockExplorerUrls: network.blockExplorer ? [network.blockExplorer] : [],
-            }],
-          });
-          return true;
-        }
+        throw new Error("La red no está configurada en MetaMask");
       }
-      console.error("Error cambiando red:", error);
       throw error;
     }
+  }
+
+  getProvider(): BrowserProvider | null {
+    return this.provider;
+  }
+
+  // Método para forzar la actualización del balance
+  async refreshBalance(): Promise<void> {
+    console.log("Manual balance refresh requested");
+    const account = this.accountSubject.getValue();
+    if (account) {
+      // Recrear el provider para asegurarnos de que está actualizado
+      if (window.ethereum) {
+        this.provider = new BrowserProvider(window.ethereum);
+      }
+      await this.updateBalance(account);
+    } else {
+      console.log("No account available to refresh balance");
+    }
+  }
+
+  // Método para verificar si hay una conexión guardada y reconectar
+  async autoReconnect(): Promise<boolean> {
+    return this.checkConnection();
   }
 }

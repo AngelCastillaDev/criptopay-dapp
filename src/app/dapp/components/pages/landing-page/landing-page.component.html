@@ -1,13 +1,14 @@
 <div class="min-h-screen flex flex-col bg-gray-950 text-white overflow-hidden">
     <!-- Animated Background Elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-0 w-full h-full opacity-10">
-            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500 rounded-full filter blur-3xl animate-pulse">
-            </div>
-            <div class="absolute top-3/4 right-1/4 w-64 h-64 bg-indigo-600 rounded-full filter blur-3xl animate-pulse"
-                style="animation-delay: 2s;"></div>
-            <div class="absolute bottom-1/4 left-1/2 w-80 h-80 bg-purple-700 rounded-full filter blur-3xl animate-pulse"
-                style="animation-delay: 4s;"></div>
+    <div class="animated-bg">
+        <div class="animated-bg-element animate-pulse"
+            style="top: 10%; left: 10%; width: 500px; height: 500px; background: radial-gradient(circle, #06b6d4 0%, transparent 70%);">
+        </div>
+        <div class="animated-bg-element animate-pulse"
+            style="top: 60%; left: 70%; width: 400px; height: 400px; background: radial-gradient(circle, #3b82f6 0%, transparent 70%); animation-delay: 2s;">
+        </div>
+        <div class="animated-bg-element animate-pulse"
+            style="top: 40%; left: 40%; width: 600px; height: 600px; background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); animation-delay: 4s;">
         </div>
     </div>
 
@@ -16,124 +17,801 @@
         <div class="flex items-center group cursor-pointer">
             <img src="../../../../assets/criptopay.png" alt="CriptoPay Logo"
                 class="h-12 w-12 mr-3 transition-transform duration-500 group-hover:rotate-12" />
-            <h1 class="text-2xl font-bold text-cyan-400">
+            <h1
+                class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
                 CriptoPay
             </h1>
         </div>
+        <div class="hidden md:flex items-center space-x-6">
+            <a (click)="scrollToSection('descripcion')"
+                class="nav-link text-white hover:text-cyan-400 transition-colors duration-300 cursor-pointer">Descripción</a>
+            <a (click)="scrollToSection('caracteristicas')"
+                class="nav-link text-white hover:text-cyan-400 transition-colors duration-300 cursor-pointer">Características</a>
+            <a (click)="scrollToSection('redes')"
+                class="nav-link text-white hover:text-cyan-400 transition-colors duration-300 cursor-pointer">Redes</a>
+        </div>
         <button (click)="showLoginModal = true"
-            class="relative overflow-hidden bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
-            Iniciar sesión
+            class="cta-button bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+            Conectar Wallet
         </button>
     </header>
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-12 md:py-24 relative z-10">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-6xl mx-auto">
             <!-- Hero Section with Animation -->
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
-                    Bienvenido a CriptoPay
+            <div class="text-center mb-16 animate-fadeInUp" id="hero">
+                <h2 class="hero-title text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
+                    Bienvenido a <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">CriptoPay</span>
                 </h2>
-                <h3 class="text-2xl md:text-3xl font-light mb-8 text-cyan-400">
-                    Tu billetera descentralizada
+                <h3 class="hero-subtitle text-2xl md:text-3xl font-light mb-8 text-cyan-400">
+                    Tu plataforma descentralizada para transacciones blockchain
                 </h3>
-                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800">
+                <div
+                    class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 animate-fadeInUp delay-200 hover:border-cyan-500 transition-all duration-500">
                     <p class="text-lg md:text-xl text-white leading-relaxed">
-                        CriptoPay es tu billetera digital descentralizada que permite enviar y recibir Ether de manera
-                        rápida y segura.
-                        Podrás generar códigos QR para recibir pagos, escanear códigos para pagar fácilmente, mantener
-                        un historial
-                        de tus transacciones y gestionar tus contactos sin complicaciones.
+                        CriptoPay es una plataforma descentralizada que te permite conectar con MetaMask y realizar
+                        transacciones
+                        en diferentes redes blockchain. Gestiona tus activos digitales, visualiza tu
+                        historial de transacciones y administra tus contactos, todo en una interfaz intuitiva y segura.
                     </p>
                 </div>
             </div>
 
-            <!-- Features Section with Animations -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-                <div>
-                    <div
-                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
-                        <div
-                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </div>
-                        <h3
-                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
-                            Seguridad Garantizada</h3>
-                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Tus
-                            claves privadas nunca salen de tu dispositivo. Mantenemos los más altos
-                            estándares de seguridad para proteger tus activos digitales.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <div
-                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
-                        <div
-                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <h3
-                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
-                            Transacciones Rápidas</h3>
-                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
-                            Envía y recibe criptomonedas en segundos. Sin esperas, sin complicaciones.
-                            Experimenta la velocidad de las transacciones blockchain.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <div
-                        class="h-full bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
-                        <div
-                            class="bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                        </div>
-                        <h3
-                            class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
-                            Control Total</h3>
-                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">Tú
-                            tienes el control absoluto de tus fondos. Sin intermediarios, sin
-                            restricciones. La verdadera libertad financiera en tus manos.</p>
-                    </div>
-                </div>
+            <!-- Tabs Navigation -->
+            <div
+                class="flex flex-wrap justify-center gap-4 md:gap-8 mb-12 border-b border-gray-800 pb-4 animate-fadeInUp delay-300 tab-container">
+                <button [ngClass]="{'active': activeTab === 'descripcion'}" (click)="setActiveTab('descripcion')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Descripción
+                </button>
+                <button [ngClass]="{'active': activeTab === 'objetivos'}" (click)="setActiveTab('objetivos')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Objetivos
+                </button>
+                <button [ngClass]="{'active': activeTab === 'beneficios'}" (click)="setActiveTab('beneficios')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Beneficios
+                </button>
+                <button [ngClass]="{'active': activeTab === 'caracteristicas'}"
+                    (click)="setActiveTab('caracteristicas')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Características
+                </button>
+                <button [ngClass]="{'active': activeTab === 'equipo'}" (click)="setActiveTab('equipo')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Equipo
+                </button>
+                <button [ngClass]="{'active': activeTab === 'conclusiones'}" (click)="setActiveTab('conclusiones')"
+                    class="tab-button text-lg font-medium text-white hover:text-cyan-400 transition-colors duration-300">
+                    Conclusiones
+                </button>
             </div>
 
-            <!-- Stats Section -->
-            <div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
-                    <div class="text-4xl font-bold text-cyan-400 mb-2">+100K</div>
-                    <div class="text-white">Usuarios activos</div>
+            <!-- Tab Content -->
+            <div class="mt-8 animate-fadeInUp delay-400">
+                <!-- Descripción Tab -->
+                <div *ngIf="activeTab === 'descripcion'" class="space-y-8" id="descripcion">
+                    <div
+                        class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 hover:border-cyan-500 transition-all duration-500">
+                        <h3
+                            class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                            Descripción del Proyecto</h3>
+                        <p class="text-lg text-white leading-relaxed mb-4">
+                            CriptoPay es una aplicación descentralizada (dApp) diseñada para facilitar las transacciones
+                            en blockchain
+                            a través de una interfaz intuitiva y segura. Nuestra plataforma permite a los usuarios
+                            conectar sus wallets
+                            de MetaMask y realizar operaciones en diferentes redes como Ethereum, Sepolia, Goerli,
+                            Holesky, Polygon y Mumbai.
+                        </p>
+                        <p class="text-lg text-white leading-relaxed mb-4">
+                            A diferencia de otras soluciones, CriptoPay se enfoca en proporcionar una experiencia de
+                            usuario fluida
+                            mientras mantiene todas las ventajas de la tecnología blockchain: seguridad, transparencia y
+                            control total
+                            sobre tus activos digitales.
+                        </p>
+                        <p class="text-lg text-white leading-relaxed">
+                            La plataforma incluye funcionalidades como historial de transacciones, gestión de contactos
+                            y soporte
+                            para múltiples redes, todo ello manteniendo los más altos estándares de seguridad y
+                            privacidad.
+                        </p>
+                    </div>
+
+                    <!-- Redes Soportadas -->
+                    <div class="mt-12" id="redes">
+                        <h3
+                            class="text-2xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                            Redes Soportadas</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 network-grid">
+                            <!-- Ethereum -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <path fill="#627EEA"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 3v6.75l5.25 2.25L12 3z" />
+                                        <path fill="#FFF" d="M12 3L6.75 12l5.25-2.25V3z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 16.5v4.5l5.25-7.5L12 16.5z" />
+                                        <path fill="#FFF" d="M12 21v-4.5l-5.25-3L12 21z" />
+                                        <path fill="#FFF" fill-opacity="0.2" d="M12 15.375L17.25 12 12 9v6.375z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M6.75 12L12 15.375V9L6.75 12z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Ethereum</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-green-500/20 rounded-full text-green-400 text-xs font-medium">
+                                    Mainnet
+                                </div>
+                            </div>
+
+                            <!-- Sepolia -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <circle cx="12" cy="12" r="12" fill="#9064FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Sepolia</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-purple-500/20 rounded-full text-purple-400 text-xs font-medium">
+                                    Testnet
+                                </div>
+                            </div>
+
+                            <!-- Goerli -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <circle cx="12" cy="12" r="12" fill="#F6C343" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Goerli</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-yellow-500/20 rounded-full text-yellow-400 text-xs font-medium">
+                                    Testnet
+                                </div>
+                            </div>
+
+                            <!-- Holesky -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <circle cx="12" cy="12" r="12" fill="#5298FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Holesky</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-xs font-medium">
+                                    Testnet
+                                </div>
+                            </div>
+
+                            <!-- Polygon -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Polygon</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-indigo-500/20 rounded-full text-indigo-400 text-xs font-medium">
+                                    Mainnet
+                                </div>
+                            </div>
+
+                            <!-- Mumbai -->
+                            <div
+                                class="network-card bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                                <div class="w-16 h-16 mb-4 flex items-center justify-center">
+                                    <svg viewBox="0 0 24 24" class="w-12 h-12">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" opacity="0.7"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-white">Mumbai</h4>
+                                <div
+                                    class="mt-2 px-3 py-1 bg-indigo-500/20 rounded-full text-indigo-400 text-xs font-medium">
+                                    Testnet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network Showcase -->
+                    <div class="mt-16 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 rounded-2xl">
+                        </div>
+                        <div class="relative p-8 rounded-2xl border border-gray-800 overflow-hidden">
+                            <div class="flex flex-col md:flex-row items-center justify-between">
+                                <div class="mb-8 md:mb-0 md:mr-8 md:w-1/2">
+                                    <h3
+                                        class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                                        Red Destacada</h3>
+                                    <p class="text-lg text-white leading-relaxed mb-6">
+                                        Explora la red {{ networks[currentNetworkIndex].name }} y descubre todas sus
+                                        posibilidades.
+                                        CriptoPay te permite conectarte fácilmente y realizar transacciones de forma
+                                        segura.
+                                    </p>
+                                    <button (click)="toggleNetworkInfo()"
+                                        class="cta-button bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+                                        {{ showNetworkInfo ? 'Ocultar Información' : 'Más Información' }}
+                                    </button>
+                                </div>
+                                <div class="network-icon animate-float md:w-1/2 flex justify-center">
+                                    <!-- Ethereum -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'ethereum'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <path fill="#627EEA"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 3v6.75l5.25 2.25L12 3z" />
+                                        <path fill="#FFF" d="M12 3L6.75 12l5.25-2.25V3z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 16.5v4.5l5.25-7.5L12 16.5z" />
+                                        <path fill="#FFF" d="M12 21v-4.5l-5.25-3L12 21z" />
+                                        <path fill="#FFF" fill-opacity="0.2" d="M12 15.375L17.25 12 12 9v6.375z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M6.75 12L12 15.375V9L6.75 12z" />
+                                    </svg>
+
+                                    <!-- Sepolia -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'sepolia'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <circle cx="12" cy="12" r="12" fill="#9064FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+
+                                    <!-- Goerli -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'goerli'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <circle cx="12" cy="12" r="12" fill="#F6C343" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+
+                                    <!-- Holesky -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'holesky'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <circle cx="12" cy="12" r="12" fill="#5298FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+
+                                    <!-- Polygon -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'polygon'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+
+                                    <!-- Mumbai -->
+                                    <svg *ngIf="networks[currentNetworkIndex].id === 'mumbai'" viewBox="0 0 24 24"
+                                        class="w-32 h-32">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" opacity="0.7"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Network Info -->
+                            <div *ngIf="showNetworkInfo" class="mt-8 bg-gray-800/50 p-6 rounded-xl animate-fadeInUp">
+                                <h4 class="text-xl font-bold mb-4 text-cyan-400">Información de {{
+                                    networks[currentNetworkIndex].name }}</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <p class="text-white mb-2"><span class="text-gray-300">Tipo:</span> {{
+                                            networks[currentNetworkIndex].id === 'ethereum' ||
+                                            networks[currentNetworkIndex].id === 'polygon' ? 'Mainnet' : 'Testnet' }}
+                                        </p>
+                                        <p class="text-white mb-2"><span class="text-gray-300">Compatibilidad:</span>
+                                            EVM (Ethereum Virtual Machine)</p>
+                                        <p class="text-white"><span class="text-gray-300">Gas Token:</span> {{
+                                            networks[currentNetworkIndex].id === 'polygon' ||
+                                            networks[currentNetworkIndex].id === 'mumbai' ? 'MATIC' : 'ETH' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-white mb-2"><span class="text-gray-300">Velocidad de
+                                                Bloque:</span> {{ networks[currentNetworkIndex].id === 'polygon' ||
+                                            networks[currentNetworkIndex].id === 'mumbai' ? '~2 segundos' : '~12
+                                            segundos' }}</p>
+                                        <p class="text-white mb-2"><span class="text-gray-300">Consenso:</span> {{
+                                            networks[currentNetworkIndex].id === 'polygon' ||
+                                            networks[currentNetworkIndex].id === 'mumbai' ? 'Proof of Stake' : 'Proof of
+                                            Stake' }}</p>
+                                        <p class="text-white"><span class="text-gray-300">Explorador:</span> <a href="#"
+                                                class="text-cyan-400 hover:underline">Ver Explorador</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
-                    <div class="text-4xl font-bold text-cyan-400 mb-2">$10M+</div>
-                    <div class="text-white">Transacciones diarias</div>
+
+                <!-- Objetivos Tab -->
+                <div *ngIf="activeTab === 'objetivos'" class="space-y-8">
+                    <div
+                        class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 hover:border-cyan-500 transition-all duration-500">
+                        <h3
+                            class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                            Objetivos del Proyecto</h3>
+                        <ul class="space-y-4 text-lg text-white">
+                            <li
+                                class="flex items-start transform hover:translate-x-2 transition-transform duration-300">
+                                <div class="bg-cyan-600/20 p-2 rounded-lg mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span>Simplificar la experiencia de usuario en transacciones blockchain, eliminando la
+                                    complejidad técnica.</span>
+                            </li>
+                            <li
+                                class="flex items-start transform hover:translate-x-2 transition-transform duration-300">
+                                <div class="bg-cyan-600/20 p-2 rounded-lg mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span>Proporcionar soporte para múltiples redes, facilitando el desarrollo y prueba de
+                                    aplicaciones descentralizadas.</span>
+                            </li>
+                            <li
+                                class="flex items-start transform hover:translate-x-2 transition-transform duration-300">
+                                <div class="bg-cyan-600/20 p-2 rounded-lg mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span>Crear una interfaz intuitiva para la gestión de transacciones y contactos en el
+                                    ecosistema blockchain.</span>
+                            </li>
+                            <li
+                                class="flex items-start transform hover:translate-x-2 transition-transform duration-300">
+                                <div class="bg-cyan-600/20 p-2 rounded-lg mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span>Mantener los más altos estándares de seguridad y privacidad en todas las
+                                    operaciones.</span>
+                            </li>
+                            <li
+                                class="flex items-start transform hover:translate-x-2 transition-transform duration-300">
+                                <div class="bg-cyan-600/20 p-2 rounded-lg mr-4 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span>Educar a los usuarios sobre las ventajas y el funcionamiento de la tecnología
+                                    blockchain.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                        <div
+                            class="bg-gray-900 p-6 rounded-2xl border border-gray-800 hover:border-cyan-500 transition-all duration-500 text-center">
+                            <div class="text-4xl font-bold text-cyan-400 mb-2 stat-counter">6+</div>
+                            <div class="text-white text-lg">Redes Soportadas</div>
+                        </div>
+                        <div
+                            class="bg-gray-900 p-6 rounded-2xl border border-gray-800 hover:border-cyan-500 transition-all duration-500 text-center">
+                            <div class="text-4xl font-bold text-cyan-400 mb-2 stat-counter">100%</div>
+                            <div class="text-white text-lg">Seguridad</div>
+                        </div>
+                        <div
+                            class="bg-gray-900 p-6 rounded-2xl border border-gray-800 hover:border-cyan-500 transition-all duration-500 text-center">
+                            <div class="text-4xl font-bold text-cyan-400 mb-2 stat-counter">24/7</div>
+                            <div class="text-white text-lg">Disponibilidad</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center">
-                    <div class="text-4xl font-bold text-cyan-400 mb-2">99.9%</div>
-                    <div class="text-white">Tiempo de actividad</div>
+
+                <!-- Beneficios Tab -->
+                <div *ngIf="activeTab === 'beneficios'" class="space-y-8">
+                    <div
+                        class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 hover:border-cyan-500 transition-all duration-500">
+                        <h3
+                            class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                            Beneficios de CriptoPay</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-6">
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Seguridad Garantizada</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Tus claves privadas nunca salen de tu dispositivo, garantizando la máxima
+                                            seguridad de tus activos.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Transacciones Rápidas</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Envía y recibe criptomonedas en segundos, sin esperas ni complicaciones.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Soporte Multi-Red</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Conecta con múltiples redes blockchain desde una sola interfaz unificada.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Control Total</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Tú tienes el control absoluto de tus fondos, sin intermediarios ni
+                                            restricciones.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Gestión de Contactos</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Administra tus contactos de forma sencilla para realizar transacciones
+                                            frecuentes.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start group">
+                                    <div
+                                        class="bg-cyan-600/20 p-3 rounded-lg mr-4 group-hover:bg-cyan-600/40 transition-all duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4
+                                            class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            Historial Detallado</h4>
+                                        <p class="text-gray-300 group-hover:text-white transition-colors duration-300">
+                                            Accede a un historial completo de todas tus transacciones con información
+                                            detallada.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Características Tab -->
+                <div *ngIf="activeTab === 'caracteristicas'" class="space-y-8" id="caracteristicas">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Múltiples Redes</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Soporte para diferentes redes como Ethereum, Sepolia, Goerli, Holesky, Polygon y Mumbai,
+                                permitiéndote experimentar con distintos entornos blockchain.
+                            </p>
+                        </div>
+
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Historial de Transacciones</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Visualiza y gestiona todo tu historial de transacciones en un solo lugar, con
+                                información detallada sobre cada operación realizada.
+                            </p>
+                        </div>
+
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Gestión de Contactos</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Administra tus contactos frecuentes para realizar transacciones de forma rápida y
+                                segura, sin necesidad de recordar direcciones complejas.
+                            </p>
+                        </div>
+
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Conexión con MetaMask</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Integración perfecta con MetaMask, la wallet más popular para interactuar con
+                                aplicaciones descentralizadas.
+                            </p>
+                        </div>
+
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Transacciones Rápidas</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Realiza transacciones de forma rápida y sencilla, con confirmaciones en tiempo real y
+                                notificaciones instantáneas.
+                            </p>
+                        </div>
+
+                        <div
+                            class="feature-card bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-cyan-500 transition-all duration-500 group hover:shadow-xl relative overflow-hidden">
+                            <div
+                                class="feature-icon bg-cyan-600 p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 relative z-10">
+                                Interfaz Intuitiva</h3>
+                            <p
+                                class="text-gray-300 group-hover:text-white transition-colors duration-300 relative z-10">
+                                Diseño centrado en el usuario que facilita la navegación y el uso de todas las
+                                funcionalidades, incluso para principiantes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipo Tab -->
+                <div *ngIf="activeTab === 'equipo'" class="space-y-8" id="equipo">
+                    <h3
+                        class="text-2xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                        Nuestro Equipo</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 team-grid">
+                        <div *ngFor="let member of teamMembers"
+                            class="team-card bg-gray-900 p-6 rounded-2xl border border-gray-800 overflow-hidden">
+                            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                                <div
+                                    class="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 border-4 border-cyan-500/30">
+                                    <img [src]="member.photo" [alt]="member.name"
+                                        class="w-full h-full object-cover team-photo">
+                                </div>
+                                <div class="flex flex-col items-center md:items-start">
+                                    <h4 class="text-xl font-bold text-white mb-1">{{member.name}}</h4>
+                                    <p class="text-cyan-400 mb-4">{{member.role}}</p>
+                                    <p class="text-gray-300 text-center md:text-left">{{member.description}}</p>
+                                    <div class="mt-4 flex space-x-3">
+                                        <a href="#"
+                                            class="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z" />
+                                            </svg>
+                                        </a>
+                                        <a href="#"
+                                            class="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                                            </svg>
+                                        </a>
+                                        <a href="#"
+                                            class="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusiones Tab -->
+                <div *ngIf="activeTab === 'conclusiones'" class="space-y-8">
+                    <div
+                        class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800 hover:border-cyan-500 transition-all duration-500">
+                        <h3
+                            class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">
+                            Conclusiones</h3>
+                        <p class="text-lg text-white leading-relaxed mb-4">
+                            CriptoPay representa un avance significativo en la forma en que interactuamos con la
+                            tecnología blockchain,
+                            haciendo que las transacciones sean más accesibles y fáciles de usar para todos los
+                            usuarios,
+                            independientemente de su nivel de experiencia técnica.
+                        </p>
+                        <p class="text-lg text-white leading-relaxed mb-4">
+                            Nuestro enfoque en la experiencia de usuario, combinado con el soporte para múltiples redes
+                            y la
+                            integración con MetaMask, posiciona a CriptoPay como una solución integral para quienes
+                            desean
+                            aprovechar las ventajas de la tecnología blockchain sin enfrentarse a su complejidad
+                            inherente.
+                        </p>
+                        <p class="text-lg text-white leading-relaxed">
+                            A medida que el ecosistema blockchain continúa evolucionando, CriptoPay se compromete a
+                            mantenerse
+                            a la vanguardia, incorporando nuevas funcionalidades y mejoras que respondan a las
+                            necesidades
+                            cambiantes de nuestros usuarios y del mercado en general.
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- CTA Section -->
-            <div class="mt-24 text-center">
-                <button (click)="showLoginModal = true"
-                    class="relative overflow-hidden bg-cyan-600 hover:bg-cyan-700 text-white px-10 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105">
-                    Comenzar Ahora
-                </button>
-                <p class="mt-6 text-gray-300">Únete a miles de usuarios que ya confían en CriptoPay</p>
+            <div class="mt-24 text-center animate-fadeInUp delay-500">
+                <div
+                    class="bg-gradient-to-r from-cyan-900/50 to-indigo-900/50 p-8 md:p-12 rounded-2xl border border-gray-800">
+                    <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">¿Listo para comenzar?</h3>
+                    <p class="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                        Únete a miles de usuarios que ya están disfrutando de la experiencia CriptoPay. Conecta tu
+                        wallet y comienza a realizar transacciones de forma sencilla y segura.
+                    </p>
+                    <button (click)="showLoginModal = true"
+                        class="cta-button bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white px-10 py-5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105">
+                        Conectar Wallet
+                    </button>
+                    <div class="mt-6 flex justify-center space-x-8">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span class="text-gray-300">100% Seguro</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span class="text-gray-300">Rápido</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                            </svg>
+                            <span class="text-gray-300">Multi-Red</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -144,13 +822,17 @@
             <div class="mb-4 md:mb-0">
                 <div class="flex items-center">
                     <img src="../../../../assets/criptopay.png" alt="CriptoPay Logo" class="h-8 w-8 mr-2" />
-                    <span class="text-xl font-bold text-cyan-400">CriptoPay</span>
+                    <span
+                        class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 animate-gradient">CriptoPay</span>
                 </div>
             </div>
-            <div class="flex space-x-6 mb-4 md:mb-0">
-                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Términos</a>
-                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Privacidad</a>
-                <a href="#" class="text-white hover:text-cyan-400 transition-colors duration-300">Soporte</a>
+            <div class="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
+                <a href="#" class="nav-link text-white hover:text-cyan-400 transition-colors duration-300">Términos</a>
+                <a href="#"
+                    class="nav-link text-white hover:text-cyan-400 transition-colors duration-300">Privacidad</a>
+                <a href="#" class="nav-link text-white hover:text-cyan-400 transition-colors duration-300">Soporte</a>
+                <a href="#"
+                    class="nav-link text-white hover:text-cyan-400 transition-colors duration-300">Documentación</a>
             </div>
             <div class="text-gray-300 text-sm">
                 <p>© 2025 CriptoPay. Todos los derechos reservados.</p>
@@ -163,6 +845,6 @@
         (selectBlockchain)="onSelectBlockchain($event)"></app-login-modal>
 
     <!-- Wallet Modal -->
-    <app-wallet-modal *ngIf="showWalletModal" [blockchain]="selectedBlockchain" (close)="showWalletModal = false"
-        (selectWallet)="onSelectWallet($event)"></app-wallet-modal>
+    <app-wallet-modal *ngIf="showWalletModal" [blockchain]="selectedBlockchain"
+        (close)="showWalletModal = false"></app-wallet-modal>
 </div>

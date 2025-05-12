@@ -1,0 +1,170 @@
+<header class="bg-gray-800 shadow-md z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+
+            <!-- Sección izquierda: Botón de cerrar sesión -->
+            <div class="flex items-center">
+                <button (click)="logout()" [disabled]="isLoggingOut"
+                    class="p-2 rounded-full text-red-400 hover:text-red-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 transition-colors">
+                    <svg *ngIf="!isLoggingOut" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <svg *ngIf="isLoggingOut" class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Sección central: Título de la página -->
+            <div class="flex items-center justify-center flex-1">
+                <h1 class="text-xl font-semibold text-white">{{ currentTitle }}</h1>
+            </div>
+            <!-- Sección derecha: Selector de red -->
+            <div class="flex items-center">
+                <div class="relative">
+                    <button (click)="toggleNetworkDropdown($event)"
+                        class="flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors">
+                        <div class="flex items-center">
+                            <div class="network-icon mr-2">
+                                <!-- Iconos de red -->
+                                <div [ngSwitch]="getNetworkIcon(currentChainId)" class="w-5 h-5">
+                                    <!-- Ethereum -->
+                                    <svg *ngSwitchCase="'ethereum'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <path fill="#627EEA"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 3v6.75l5.25 2.25L12 3z" />
+                                        <path fill="#FFF" d="M12 3L6.75 12l5.25-2.25V3z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M12 16.5v4.5l5.25-7.5L12 16.5z" />
+                                        <path fill="#FFF" d="M12 21v-4.5l-5.25-3L12 21z" />
+                                        <path fill="#FFF" fill-opacity="0.2" d="M12 15.375L17.25 12 12 9v6.375z" />
+                                        <path fill="#FFF" fill-opacity="0.6" d="M6.75 12L12 15.375V9L6.75 12z" />
+                                    </svg>
+                                    <!-- Sepolia -->
+                                    <svg *ngSwitchCase="'sepolia'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <circle cx="12" cy="12" r="12" fill="#9064FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                    <!-- Goerli -->
+                                    <svg *ngSwitchCase="'goerli'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <circle cx="12" cy="12" r="12" fill="#F6C343" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                    <!-- Holesky -->
+                                    <svg *ngSwitchCase="'holesky'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <circle cx="12" cy="12" r="12" fill="#5298FF" />
+                                        <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                    </svg>
+                                    <!-- Polygon -->
+                                    <svg *ngSwitchCase="'polygon'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+                                    <!-- Mumbai -->
+                                    <svg *ngSwitchCase="'mumbai'" viewBox="0 0 24 24" class="w-5 h-5">
+                                        <path fill="#8247E5"
+                                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                        <path fill="#FFF" opacity="0.7"
+                                            d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                    </svg>
+                                    <!-- Desconocido -->
+                                    <svg *ngSwitchDefault viewBox="0 0 24 24" class="w-5 h-5">
+                                        <circle cx="12" cy="12" r="12" fill="#888" />
+                                        <text x="12" y="16" font-size="12" text-anchor="middle" fill="#fff">?</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                            <div class="text-sm text-gray-300">
+                                {{ currentNetwork }}
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 ml-2" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown de redes -->
+                    <div *ngIf="showNetworkDropdown"
+                        class="absolute left-0 mt-1 bg-gray-800 rounded-md shadow-lg z-20 w-56 py-1 overflow-hidden">
+                        <div class="max-h-60 overflow-y-auto">
+                            <button *ngFor="let network of networks"
+                                (click)="switchNetwork(network.chainId, network.name); $event.stopPropagation()"
+                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 flex items-center"
+                                [class.opacity-50]="isChangingNetwork">
+                                <div class="network-icon mr-2">
+                                    <!-- Iconos de red -->
+                                    <div [ngSwitch]="network.icon" class="w-5 h-5">
+                                        <!-- Ethereum -->
+                                        <svg *ngSwitchCase="'ethereum'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <path fill="#627EEA"
+                                                d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                            <path fill="#FFF" fill-opacity="0.6" d="M12 3v6.75l5.25 2.25L12 3z" />
+                                            <path fill="#FFF" d="M12 3L6.75 12l5.25-2.25V3z" />
+                                            <path fill="#FFF" fill-opacity="0.6" d="M12 16.5v4.5l5.25-7.5L12 16.5z" />
+                                            <path fill="#FFF" d="M12 21v-4.5l-5.25-3L12 21z" />
+                                            <path fill="#FFF" fill-opacity="0.2" d="M12 15.375L17.25 12 12 9v6.375z" />
+                                            <path fill="#FFF" fill-opacity="0.6" d="M6.75 12L12 15.375V9L6.75 12z" />
+                                        </svg>
+                                        <!-- Sepolia -->
+                                        <svg *ngSwitchCase="'sepolia'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <circle cx="12" cy="12" r="12" fill="#9064FF" />
+                                            <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                        </svg>
+                                        <!-- Goerli -->
+                                        <svg *ngSwitchCase="'goerli'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <circle cx="12" cy="12" r="12" fill="#F6C343" />
+                                            <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                        </svg>
+                                        <!-- Holesky -->
+                                        <svg *ngSwitchCase="'holesky'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <circle cx="12" cy="12" r="12" fill="#5298FF" />
+                                            <path fill="#FFF" d="M12 6l-6 6 6 6 6-6-6-6z" />
+                                        </svg>
+                                        <!-- Polygon -->
+                                        <svg *ngSwitchCase="'polygon'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <path fill="#8247E5"
+                                                d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                            <path fill="#FFF"
+                                                d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                        </svg>
+                                        <!-- Mumbai -->
+                                        <svg *ngSwitchCase="'mumbai'" viewBox="0 0 24 24" class="w-5 h-5">
+                                            <path fill="#8247E5"
+                                                d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+                                            <path fill="#FFF" opacity="0.7"
+                                                d="M16.5 8.25l-3-1.73a1.5 1.5 0 00-1.5 0l-3 1.73a1.5 1.5 0 00-.75 1.3v3.45a1.5 1.5 0 00.75 1.3l3 1.73a1.5 1.5 0 001.5 0l3-1.73a1.5 1.5 0 00.75-1.3V9.55a1.5 1.5 0 00-.75-1.3z" />
+                                        </svg>
+                                        <!-- Desconocido -->
+                                        <svg *ngSwitchDefault viewBox="0 0 24 24" class="w-5 h-5">
+                                            <circle cx="12" cy="12" r="12" fill="#888" />
+                                            <text x="12" y="16" font-size="12" text-anchor="middle" fill="#fff">?</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between w-full">
+                                    <div>
+                                        <span>{{ network.name }}</span>
+                                        <span *ngIf="network.testnet"
+                                            class="ml-2 text-xs px-1.5 py-0.5 bg-gray-700 rounded-full text-gray-300">Testnet</span>
+                                    </div>
+                                    <div class="w-3 h-3 rounded-full ml-2"
+                                        [ngClass]="{'bg-green-500': network.chainId === currentChainId, 'bg-gray-500': network.chainId !== currentChainId}">
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

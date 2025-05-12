@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, Router } from "@angular/router";
-import { WalletService } from "../../services/wallet.service";
+import { WalletService } from "../../../services/wallet.service";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 interface NavItem {
@@ -24,23 +24,29 @@ export class SidebarComponent {
   isOpen = true;
   walletAddress = "";
   balance = "0";
+  isLoggingOut = false;
 
   navItems: NavItem[] = [];
 
   constructor(
     private walletService: WalletService,
     private router: Router,
-    private sanitizer: DomSanitizer // ⬅️ Inyectar
+    private sanitizer: DomSanitizer
   ) {
     this.walletService.account$.subscribe((account) => {
       this.walletAddress = account || "";
+
+      // If account is empty and we had an account before, redirect to landing
+      if (!account && this.walletAddress) {
+        this.router.navigate(["/"]);
+      }
     });
 
     this.walletService.balance$.subscribe((balance) => {
       this.balance = balance;
     });
 
-    // Aquí inicializamos los íconos asegurados
+    // Initialize nav items with sanitized icons - SOLO 4 OPCIONES
     this.navItems = [
       {
         label: "Dashboard",
@@ -50,24 +56,10 @@ export class SidebarComponent {
         ),
       },
       {
-        label: "Enviar Pago",
-        route: "/dashboard/send",
+        label: "Realizar Transacción",
+        route: "/dashboard/transaction",
         icon: this.sanitizer.bypassSecurityTrustHtml(
-          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>`
-        ),
-      },
-      {
-        label: "Recibir Pago",
-        route: "/dashboard/receive",
-        icon: this.sanitizer.bypassSecurityTrustHtml(
-          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>`
-        ),
-      },
-      {
-        label: "Contactos",
-        route: "/dashboard/contacts",
-        icon: this.sanitizer.bypassSecurityTrustHtml(
-          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>`
+          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>`
         ),
       },
       {
@@ -78,12 +70,12 @@ export class SidebarComponent {
         ),
       },
       {
-        label: "Retirar",
-        route: "/dashboard/withdraw",
+        label: "Contactos",
+        route: "/dashboard/contacts",
         icon: this.sanitizer.bypassSecurityTrustHtml(
-          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>`
+          `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>`
         ),
-      },
+      }
     ];
   }
 
@@ -92,9 +84,22 @@ export class SidebarComponent {
     this.sidebarToggled.emit(this.isOpen);
   }
 
-  logout() {
-    this.walletService.disconnect();
-    localStorage.removeItem("walletConnected");
-    this.router.navigate(["/"]);
+  async logout() {
+    this.isLoggingOut = true;
+
+    try {
+      // Disconnect from wallet service
+      await this.walletService.disconnect();
+
+      // Clear local storage
+      localStorage.removeItem("walletConnected");
+
+      // Navigate to landing page
+      this.router.navigate(["/"]);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      this.isLoggingOut = false;
+    }
   }
 }
