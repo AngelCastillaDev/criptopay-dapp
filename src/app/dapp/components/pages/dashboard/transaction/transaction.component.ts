@@ -5,7 +5,9 @@ import { Subscription } from "rxjs"
 import { WalletService } from "./../../../../services/wallet.service"
 import { ContactService, Contact } from "./../../../../services/contact.service"
 import { HistoryService } from "./../../../../services/history.service"
-import { parseEther, parseUnits } from "ethers"
+import { NotificationService } from "./../../../../services/notificacion.service"
+import { parseEther, parseUnits, Contract } from "ethers"
+import contractAbi from "../../../../abi/transaction.json"
 
 @Component({
   selector: "app-transaction",
@@ -20,6 +22,20 @@ export class TransactionComponent implements OnInit, OnDestroy {
   amount = ""
   gasPrice = "5" // Valor predeterminado para gas (gwei)
   note = ""
+
+  // Nuevo: Tipo de transacción y dirección del contrato
+  transactionType: "normal" | "contract" = "normal"
+  contractAddress = ""
+
+  // Mapeo de direcciones de contrato por red
+  contractAddresses: { [key: string]: string } = {
+    Ethereum: "0x1234567890123456789012345678901234567890", // Ejemplo para mainnet
+    Sepolia: "0xABCDEF1234567890123456789012345678901234", // Ejemplo para Sepolia
+    Goerli: "0x9876543210987654321098765432109876543210", // Ejemplo para Goerli
+    Holesky: "0x5678901234567890123456789012345678901234", // Ejemplo para Holesky
+    Polygon: "0x3456789012345678901234567890123456789012", // Ejemplo para Polygon
+    Mumbai: "0x7890123456789012345678901234567890123456", // Ejemplo para Mumbai
+  }
 
   // Estado de la UI
   isLoading = false
@@ -44,7 +60,27 @@ export class TransactionComponent implements OnInit, OnDestroy {
     private walletService: WalletService,
     private contactService: ContactService,
     private historyService: HistoryService,
+    private notificationService: NotificationService,
   ) { }
+
+  // Método para seleccionar el tipo de transacción con animación
+  selectTransactionType(type: "normal" | "contract"): void {
+    this.transactionType = type
+
+    // Mostrar notificación informativa según el tipo seleccionado
+    if (type === "normal") {
+      this.notificationService.showInfo("Modo de transferencia normal seleccionado", 3000)
+    } else {
+      if (this.contractAddress) {
+        this.notificationService.showInfo(
+          `Modo de Smart Contract seleccionado. Usando contrato en ${this.currentNetwork}`,
+          3000,
+        )
+      } else {
+        this.notificationService.showError(`No hay contrato disponible para la red ${this.currentNetwork}`, 3000)
+      }
+    }
+  }
 
   ngOnInit(): void {
     // Suscribirse a cambios en la wallet
@@ -58,7 +94,28 @@ export class TransactionComponent implements OnInit, OnDestroy {
     // Suscribirse a cambios en la red
     this.networkSubscription = this.walletService.network$.subscribe((network) => {
       this.currentNetwork = network
+      // Actualizar la dirección del contrato cuando cambia la red
+      this.updateContractAddress()
     })
+  }
+
+  // Actualizar la dirección del contrato según la red actual
+  updateContractAddress(): void {
+    const prevAddress = this.contractAddress
+    this.contractAddress = this.contractAddresses[this.currentNetwork] || ""
+
+    // Si estamos en modo contrato y cambia la dirección, notificar al usuario
+    if (this.transactionType === "contract") {
+      if (this.contractAddress) {
+        if (prevAddress !== this.contractAddress) {
+          this.notificationService.showInfo(`Contrato actualizado para red ${this.currentNetwork}`, 3000)
+        }
+      } else {
+        this.notificationService.showError(`No hay contrato disponible para la red ${this.currentNetwork}`, 3000)
+      }
+    }
+
+    console.log(`Dirección del contrato para ${this.currentNetwork}: ${this.contractAddress}`)
   }
 
   ngOnDestroy(): void {
@@ -161,6 +218,12 @@ export class TransactionComponent implements OnInit, OnDestroy {
       return false
     }
 
+    // Validar dirección del contrato si se usa el modo contrato
+    if (this.transactionType === "contract" && !this.contractAddress) {
+      this.errorMessage = "No hay dirección de contrato disponible para la red actual"
+      return false
+    }
+
     return true
   }
 
@@ -176,10 +239,11 @@ export class TransactionComponent implements OnInit, OnDestroy {
     this.showModal = false
   }
 
-  // Cerrar modal de éxito
+  // Modificar el método closeSuccessModal para mostrar notificación
   closeSuccessModal(): void {
     this.showSuccessModal = false
     this.resetForm()
+    this.notificationService.showInfo("Puedes realizar otra transacción", 3000)
   }
 
   // Resetear formulario
@@ -190,56 +254,83 @@ export class TransactionComponent implements OnInit, OnDestroy {
     this.gasPrice = "5"
     this.note = ""
     this.transactionHash = ""
+    this.transactionType = "normal"
   }
 
-  // Enviar transacción
+  // Modificar el método sendTransaction para mostrar notificaciones
   async sendTransaction(): Promise<void> {
-    this.isLoading = true;
-    this.errorMessage = "";
+    this.isLoading = true
+    this.errorMessage = ""
 
     try {
-      const provider = this.walletService.getProvider();
-      if (!provider) throw new Error("No se pudo obtener el proveedor de wallet");
+      const provider = this.walletService.getProvider()
+      if (!provider) throw new Error("No se pudo obtener el proveedor de wallet")
 
-      const tx = {
-        to: this.recipientAddress.trim().toLowerCase(),
-        value: parseEther(this.amount),
-        gasPrice: parseUnits(this.gasPrice, "gwei"),
-      };
+      const signer = await provider.getSigner()
+      let transaction
 
-      const signer = await provider.getSigner();
-      const transaction = await signer.sendTransaction(tx);
+      if (this.transactionType === "normal") {
+        // Transferencia normal
+        const tx = {
+          to: this.recipientAddress.trim().toLowerCase(),
+          value: parseEther(this.amount),
+          gasPrice: parseUnits(this.gasPrice, "gwei"),
+        }
 
-      this.transactionHash = transaction.hash;
-      this.showModal = false;
+        transaction = await signer.sendTransaction(tx)
+      } else {
+        // Transferencia usando contrato
+        if (!this.contractAddress) {
+          throw new Error("No hay dirección de contrato disponible para la red actual")
+        }
+
+        // Crear instancia del contrato
+        const contract = new Contract(this.contractAddress, contractAbi, signer)
+
+        // Llamar a la función sendPayment del contrato
+        transaction = await contract['sendPayment'](this.recipientAddress.trim().toLowerCase(), {
+          value: parseEther(this.amount),
+          gasPrice: parseUnits(this.gasPrice, "gwei"),
+        })
+      }
+
+      this.transactionHash = transaction.hash
+      this.showModal = false
+
+      // Mostrar notificación de transacción enviada
+      this.notificationService.showSuccess("¡Transacción enviada correctamente!", 5000)
 
       // ✅ Intenta esperar confirmación, pero no lo obligues
       try {
-        await transaction.wait();
+        await transaction.wait()
+        // Mostrar notificación de transacción confirmada
+        this.notificationService.showSuccess("¡Transacción confirmada en la blockchain!", 5000)
       } catch (err) {
-        console.warn("⚠️ No se pudo confirmar vía wait():", err);
+        console.warn("⚠️ No se pudo confirmar vía wait():", err)
         // Aquí puedes esperar 5 segundos y reintentar si quieres
-        await new Promise(res => setTimeout(res, 5000));
+        await new Promise((res) => setTimeout(res, 5000))
         try {
-          await transaction.wait();
+          await transaction.wait()
+          this.notificationService.showSuccess("¡Transacción confirmada en la blockchain!", 5000)
         } catch (finalErr) {
-          console.warn("❌ Segundo intento fallido, pero continuamos");
+          console.warn("❌ Segundo intento fallido, pero continuamos")
+          this.notificationService.showInfo("Transacción enviada, pero aún no confirmada", 5000)
         }
       }
 
       // ✅ Guarda el historial de ambas partes
-      await this.saveToHistory(transaction.hash, this.currentWallet, this.recipientAddress);
-      await this.saveToHistory(transaction.hash, this.recipientAddress, this.currentWallet, true);
+      await this.saveToHistory(transaction.hash, this.currentWallet, this.recipientAddress)
+      await this.saveToHistory(transaction.hash, this.recipientAddress, this.currentWallet, true)
 
-      this.showSuccessModal = true;
-      await this.walletService.refreshBalance();
-
+      this.showSuccessModal = true
+      await this.walletService.refreshBalance()
     } catch (error: any) {
-      console.error("Error al enviar la transacción:", error);
-      this.errorMessage = error.message || "Error al enviar la transacción";
-      this.showModal = false;
+      console.error("Error al enviar la transacción:", error)
+      this.errorMessage = error.message || "Error al enviar la transacción"
+      this.showModal = false
+      this.notificationService.showError(`Error: ${this.errorMessage}`, 5000)
     } finally {
-      this.isLoading = false;
+      this.isLoading = false
     }
   }
 

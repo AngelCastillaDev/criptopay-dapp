@@ -35,13 +35,13 @@ export class LandingPageComponent implements OnInit {
     {
       name: "Angel Gabriel Castilla Sandoval",
       role: "Desarrollador Blockchain",
-      photo: "../../../../assets/team/angel.jpg",
+      photo: "https://pjfcuropecvzfclpxgeq.supabase.co/storage/v1/object/public/criptopay//angel.jpg",
       description: "Especialista en desarrollo de contratos inteligentes y arquitectura blockchain.",
     },
     {
       name: "Erick Junior Flores Lizarbe",
       role: "Desarrollador Frontend",
-      photo: "../../../../assets/team/erick.jpeg",
+      photo: "https://pjfcuropecvzfclpxgeq.supabase.co/storage/v1/object/public/criptopay//erick.jpeg",
       description: "Experto en interfaces de usuario y experiencia de usuario para aplicaciones Web3.",
     },
   ]

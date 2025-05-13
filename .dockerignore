@@ -1,0 +1,16 @@
+node_modules
+dist
+.angular
+e2e
+src/assets
+.vscode
+.idea
+*.log
+*.env*
+*.md
+Dockerfile
+docker-compose.yml
+.git
+.gitignore
+**/*.spec.ts
+**/*.test.ts

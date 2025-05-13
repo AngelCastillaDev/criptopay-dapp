@@ -4,7 +4,7 @@ import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { ContactService, Contact } from "./../../../../services/contact.service"
 import { ContactModalComponent } from "./contact-modal/contact-modal.component"
-import Swal from "sweetalert2"
+import Swal from 'sweetalert2';
 
 @Component({
   selector: "app-contacts",
