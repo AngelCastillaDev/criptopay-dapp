@@ -18,5 +18,5 @@ jobs:
 
       - name: Build and Push
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/criptopay:latest .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/criptopay:latest
