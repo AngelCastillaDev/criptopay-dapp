@@ -279,7 +279,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     let baseUrl = "https://etherscan.io/tx/"
 
-    // Ajustar URL según la red
+    // Ajustar URL según la redes
     switch (this.network) {
       case "Sepolia":
         baseUrl = "https://sepolia.etherscan.io/tx/"
