@@ -1,11 +1,20 @@
 version: "3.8"
 
 services:
-  angular-app:
-    image: angelcastilla/criptopay:latest
+  angular-app-1:
+    image: erickjunior/criptopay:latest
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "3000:80"
+    restart: unless-stopped
+
+  angular-app-2:
+    image: angelcastilla/criptopay:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"  # Cambié el puerto para evitar conflicto con el primero
     restart: unless-stopped
