@@ -10,5 +10,5 @@ services:
   angular-app-2:
     image: angelcastilla/criptopay:latest
     ports:
-      - "3001:80"  # Cambié el puerto para evitar conflicto con el primero
+      - "3001:80"
     restart: unless-stopped
