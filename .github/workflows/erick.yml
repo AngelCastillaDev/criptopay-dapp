@@ -1,0 +1,22 @@
+name: 🚀 Docker Push Latest
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.ERICK_HUB_TOKEN }}" | docker login -u "${{ secrets.ERICK_HUB_USERNAME }}" --password-stdin
+
+      - name: Build and Push
+        run: |
+          docker build -t ${{ secrets.ERICK_HUB_USERNAME }}/criptopay:latest .
+          docker push ${{ secrets.ERICK_HUB_USERNAME }}/criptopay:latest
