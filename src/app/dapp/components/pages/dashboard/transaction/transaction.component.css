@@ -1,4 +1,7 @@
-/* Agregar animación de fade in para elementos que aparecen */
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -11,21 +14,48 @@
     }
 }
 
-:host {
-    display: block;
-    animation: fadeIn 0.5s ease-out;
+.contact-search-container {
+    position: relative;
 }
 
-/* Animación para elementos que aparecen condicionalmente */
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
+/* Estilos para el modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .bg-white {
+        background-color: #1f2937;
+    }
+
+    .text-gray-900 {
+        color: #f9fafb;
+    }
+
+    .border-gray-200 {
+        border-color: #374151;
+    }
 }
 
-/* Estilos para los selectores de tipo de transacción */
-.transaction-type-selector {
+/* Animaciones adicionales */
+.transition-all {
     transition: all 0.2s ease-in-out;
 }
 
-.transaction-type-selector:hover {
-    transform: translateY(-2px);
+/* Estilos para los botones de estado */
+.disabled\:opacity-50:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para los inputs focus */
+.focus\:ring-blue-500:focus {
+    --tw-ring-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.focus\:ring-purple-500:focus {
+    --tw-ring-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.focus\:ring-green-500:focus {
+    --tw-ring-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }

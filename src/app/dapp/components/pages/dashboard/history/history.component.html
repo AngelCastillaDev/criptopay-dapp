@@ -5,7 +5,8 @@
 
         <!-- Buscador -->
         <div class="relative">
-            <input type="text" placeholder="Buscar por dirección o hash..." (input)="search($event)"
+            <input type="text" placeholder="Buscar por dirección o hash..." [value]="searchTerm"
+                (input)="search($event)"
                 class="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
@@ -17,12 +18,36 @@
         </div>
     </div>
 
+    <!-- Información de paginación y elementos por página -->
+    <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <span class="text-sm text-gray-700 dark:text-gray-300">
+                {{ getItemRange() }} transacciones
+            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+                {{ getFilterDescription() }}
+            </span>
+            <div class="flex items-center space-x-2">
+                <label for="itemsPerPage" class="text-sm text-gray-700 dark:text-gray-300">Por página:</label>
+                <select id="itemsPerPage" [value]="itemsPerPage" (change)="onItemsPerPageChange($event)"
+                    class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                    <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+            Red actual: <span class="font-medium text-gray-900 dark:text-white">{{ currentNetwork }}</span>
+        </div>
+    </div>
+
     <!-- Tarjeta principal -->
     <div
         class="bg-white dark:bg-gray-800 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="px-4 py-5 sm:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Transacciones Recientes</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Transacciones</h3>
                 <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
                     Historial de transacciones de tu wallet en la red {{ currentNetwork }}
                 </p>
@@ -32,7 +57,7 @@
             <div class="flex flex-wrap gap-2">
                 <!-- Botón de refrescar -->
                 <button (click)="refreshTransactions()" [disabled]="isLoading"
-                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
                     <svg *ngIf="!isLoading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -51,21 +76,24 @@
 
                 <!-- Filtros -->
                 <button (click)="filterTransactions('all')" [ngClass]="{
-            'bg-blue-600 text-white': currentFilter === 'all',
-            'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'all'
-          }" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    'bg-blue-600 text-white': currentFilter === 'all',
+                    'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'all'
+                }"
+                    class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                     Todas
                 </button>
                 <button (click)="filterTransactions('sent')" [ngClass]="{
-            'bg-blue-600 text-white': currentFilter === 'sent',
-            'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'sent'
-          }" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    'bg-blue-600 text-white': currentFilter === 'sent',
+                    'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'sent'
+                }"
+                    class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                     Enviadas
                 </button>
                 <button (click)="filterTransactions('received')" [ngClass]="{
-            'bg-blue-600 text-white': currentFilter === 'received',
-            'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'received'
-          }" class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    'bg-blue-600 text-white': currentFilter === 'received',
+                    'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300': currentFilter !== 'received'
+                }"
+                    class="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                     Recibidas
                 </button>
             </div>
@@ -79,20 +107,25 @@
         <!-- Lista de transacciones -->
         <div *ngIf="!isLoading" class="border-t border-gray-200 dark:border-gray-700">
             <!-- Mensaje cuando no hay transacciones -->
-            <div *ngIf="filteredTransactions.length === 0"
-                class="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
+            <div *ngIf="transactions.length === 0" class="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <p class="mt-2 text-lg font-medium">No se encontraron transacciones</p>
-                <p class="mt-1">Realiza una transacción o ajusta los filtros de búsqueda</p>
+                <p class="mt-1">
+                    <span *ngIf="currentFilter === 'all' && !searchTerm.trim()">Realiza una transacción para ver tu
+                        actividad aquí</span>
+                    <span *ngIf="currentFilter === 'sent'">No tienes transacciones enviadas</span>
+                    <span *ngIf="currentFilter === 'received'">No tienes transacciones recibidas</span>
+                    <span *ngIf="searchTerm.trim()">No se encontraron resultados para "{{ searchTerm }}"</span>
+                </p>
             </div>
 
             <!-- Lista de transacciones -->
-            <ul *ngIf="filteredTransactions.length > 0" class="divide-y divide-gray-200 dark:divide-gray-700">
-                <li *ngFor="let tx of filteredTransactions"
+            <ul *ngIf="transactions.length > 0" class="divide-y divide-gray-200 dark:divide-gray-700">
+                <li *ngFor="let tx of transactions"
                     class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     (click)="toggleTransactionDetails(tx.id)">
 
@@ -235,6 +268,92 @@
                     </div>
                 </li>
             </ul>
+        </div>
+
+        <!-- Controles de paginación -->
+        <div *ngIf="!isLoading && totalPages > 1"
+            class="bg-white dark:bg-gray-800 px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="flex items-center justify-between">
+                <!-- Información de página en móvil -->
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button (click)="goToPreviousPage()" [disabled]="currentPage === 1"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Anterior
+                    </button>
+                    <span class="text-sm text-gray-700 dark:text-gray-300 flex items-center">
+                        Página {{ currentPage }} de {{ totalPages }}
+                    </span>
+                    <button (click)="goToNextPage()" [disabled]="currentPage === totalPages"
+                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Siguiente
+                    </button>
+                </div>
+
+                <!-- Controles completos en desktop -->
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{
+                                totalPages }}</span>
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <!-- Botón Primera página -->
+                            <button (click)="goToFirstPage()" [disabled]="currentPage === 1"
+                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 9H17a1 1 0 110 2h-5.586l4.293 4.293a1 1 0 010 1.414zM9 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 9H11a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+
+                            <!-- Botón Página anterior -->
+                            <button (click)="goToPreviousPage()" [disabled]="currentPage === 1"
+                                class="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+
+                            <!-- Números de página -->
+                            <button *ngFor="let page of getPageNumbers()" (click)="goToPage(page)" [ngClass]="{
+                                    'bg-blue-50 dark:bg-blue-900 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300': page === currentPage,
+                                    'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700': page !== currentPage
+                                }" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                {{ page }}
+                            </button>
+
+                            <!-- Botón Página siguiente -->
+                            <button (click)="goToNextPage()" [disabled]="currentPage === totalPages"
+                                class="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+
+                            <!-- Botón Última página -->
+                            <button (click)="goToLastPage()" [disabled]="currentPage === totalPages"
+                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10.293 15.707a1 1 0 010-1.414L14.586 11H9a1 1 0 110-2h5.586l-4.293-4.293a1 1 0 011.414-1.414l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0zM4.293 15.707a1 1 0 010-1.414L8.586 11H3a1 1 0 110-2h5.586L4.293 4.707a1 1 0 011.414-1.414l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

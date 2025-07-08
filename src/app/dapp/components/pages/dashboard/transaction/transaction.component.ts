@@ -1,13 +1,12 @@
+import { NotificationService } from './../../../../services/notificacion.service';
+import { HistoryService } from './../../../../services/history.service';
+import { WalletService } from './../../../../services/wallet.service';
 import { Component, OnInit, OnDestroy } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { Subscription } from "rxjs"
-import { WalletService } from "./../../../../services/wallet.service"
-import { ContactService, Contact } from "./../../../../services/contact.service"
-import { HistoryService } from "./../../../../services/history.service"
-import { NotificationService } from "./../../../../services/notificacion.service"
-import { parseEther, parseUnits, Contract } from "ethers"
-import contractAbi from "../../../../abi/transaction.json"
+import { ContactService, Contact } from "../../../../services/contact.service"
+import { parseEther, parseUnits, formatEther } from "ethers"
 
 @Component({
   selector: "app-transaction",
@@ -17,28 +16,32 @@ import contractAbi from "../../../../abi/transaction.json"
   styleUrls: ["./transaction.component.css"],
 })
 export class TransactionComponent implements OnInit, OnDestroy {
-  // Datos de la transacción
+  // Modo actual de la aplicación
+  currentMode: "normal" | "contract" | "manage" = "normal"
+
+  // Datos de transacción normal
   recipientAddress = ""
   amount = ""
-  gasPrice = "5" // Valor predeterminado para gas (gwei)
+  gasPrice = "5"
   note = ""
 
-  // Nuevo: Tipo de transacción y dirección del contrato
-  transactionType: "normal" | "contract" = "normal"
+  // Datos de Smart Contract
   contractAddress = ""
+  contractBalance = "0"
+  contractAmount = ""
+  contractRecipient = ""
+  contractGasPrice = "5"
 
-  // Mapeo de direcciones de contrato por red
-  contractAddresses: { [key: string]: string } = {
-    Ethereum: "0x1234567890123456789012345678901234567890", // Ejemplo para mainnet
-    Sepolia: "0xABCDEF1234567890123456789012345678901234", // Ejemplo para Sepolia
-    Goerli: "0x9876543210987654321098765432109876543210", // Ejemplo para Goerli
-    Holesky: "0x5678901234567890123456789012345678901234", // Ejemplo para Holesky
-    Polygon: "0x3456789012345678901234567890123456789012", // Ejemplo para Polygon
-    Mumbai: "0x7890123456789012345678901234567890123456", // Ejemplo para Mumbai
-  }
+  // Datos de gestión de contratos
+  manageContractAddress = ""
+  manageContractBalance = "0"
+  depositAmount = ""
+  depositGasPrice = "5"
 
   // Estado de la UI
   isLoading = false
+  isLoadingContract = false
+  isLoadingManage = false
   showModal = false
   showSuccessModal = false
   errorMessage = ""
@@ -53,8 +56,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   searchContactTerm = ""
 
   // Suscripciones
-  private walletSubscription: Subscription | null = null
-  private networkSubscription: Subscription | null = null
+  private subscriptions: Subscription[] = []
 
   constructor(
     private walletService: WalletService,
@@ -63,69 +65,70 @@ export class TransactionComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
   ) { }
 
-  // Método para seleccionar el tipo de transacción con animación
-  selectTransactionType(type: "normal" | "contract"): void {
-    this.transactionType = type
-
-    // Mostrar notificación informativa según el tipo seleccionado
-    if (type === "normal") {
-      this.notificationService.showInfo("Modo de transferencia normal seleccionado", 3000)
-    } else {
-      if (this.contractAddress) {
-        this.notificationService.showInfo(
-          `Modo de Smart Contract seleccionado. Usando contrato en ${this.currentNetwork}`,
-          3000,
-        )
-      } else {
-        this.notificationService.showError(`No hay contrato disponible para la red ${this.currentNetwork}`, 3000)
-      }
-    }
-  }
-
   ngOnInit(): void {
     // Suscribirse a cambios en la wallet
-    this.walletSubscription = this.walletService.account$.subscribe((wallet) => {
-      this.currentWallet = wallet
-      if (wallet) {
-        this.loadContacts()
-      }
-    })
+    this.subscriptions.push(
+      this.walletService.account$.subscribe((wallet) => {
+        this.currentWallet = wallet
+        if (wallet) {
+          this.loadContacts()
+        }
+      }),
+    )
 
     // Suscribirse a cambios en la red
-    this.networkSubscription = this.walletService.network$.subscribe((network) => {
-      this.currentNetwork = network
-      // Actualizar la dirección del contrato cuando cambia la red
-      this.updateContractAddress()
-    })
-  }
+    this.subscriptions.push(
+      this.walletService.network$.subscribe((network) => {
+        this.currentNetwork = network
+      }),
+    )
 
-  // Actualizar la dirección del contrato según la red actual
-  updateContractAddress(): void {
-    const prevAddress = this.contractAddress
-    this.contractAddress = this.contractAddresses[this.currentNetwork] || ""
+    // Suscribirse a cambios en el contrato
+    this.subscriptions.push(
+      this.walletService.contractBalance$.subscribe((balance) => {
+        this.contractBalance = balance
+      }),
+    )
 
-    // Si estamos en modo contrato y cambia la dirección, notificar al usuario
-    if (this.transactionType === "contract") {
-      if (this.contractAddress) {
-        if (prevAddress !== this.contractAddress) {
-          this.notificationService.showInfo(`Contrato actualizado para red ${this.currentNetwork}`, 3000)
-        }
-      } else {
-        this.notificationService.showError(`No hay contrato disponible para la red ${this.currentNetwork}`, 3000)
-      }
-    }
-
-    console.log(`Dirección del contrato para ${this.currentNetwork}: ${this.contractAddress}`)
+    this.subscriptions.push(
+      this.walletService.contractAddress$.subscribe((address) => {
+        this.contractAddress = address
+      }),
+    )
   }
 
   ngOnDestroy(): void {
-    // Limpiar suscripciones
-    if (this.walletSubscription) {
-      this.walletSubscription.unsubscribe()
+    this.subscriptions.forEach((sub) => sub.unsubscribe())
+  }
+
+  // Cambiar modo de la aplicación
+  selectMode(mode: "normal" | "contract" | "manage"): void {
+    this.currentMode = mode
+    this.resetForms()
+
+    switch (mode) {
+      case "normal":
+        this.notificationService.showInfo("Modo de transferencia normal seleccionado")
+        break
+      case "contract":
+        this.notificationService.showInfo("Modo Smart Contract seleccionado")
+        break
+      case "manage":
+        this.notificationService.showInfo("Modo gestión de contratos seleccionado")
+        break
     }
-    if (this.networkSubscription) {
-      this.networkSubscription.unsubscribe()
-    }
+  }
+
+  // Resetear formularios
+  resetForms(): void {
+    this.recipientAddress = ""
+    this.amount = ""
+    this.contractAmount = ""
+    this.contractRecipient = ""
+    this.depositAmount = ""
+    this.searchContactTerm = ""
+    this.errorMessage = ""
+    this.showContactsList = false
   }
 
   // Cargar contactos del usuario
@@ -159,11 +162,13 @@ export class TransactionComponent implements OnInit, OnDestroy {
   onSearchContactChange(event: Event): void {
     this.searchContactTerm = (event.target as HTMLInputElement).value
 
-    // Si el usuario está ingresando una dirección directamente, actualizar recipientAddress
     if (this.searchContactTerm.startsWith("0x") && this.searchContactTerm.length === 42) {
-      this.recipientAddress = this.searchContactTerm
+      if (this.currentMode === "normal") {
+        this.recipientAddress = this.searchContactTerm
+      } else if (this.currentMode === "contract") {
+        this.contractRecipient = this.searchContactTerm
+      }
     } else {
-      // Si no es una dirección completa, filtrar contactos normalmente
       this.filterContacts()
     }
 
@@ -172,7 +177,12 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   // Seleccionar un contacto
   selectContact(contact: Contact): void {
-    this.recipientAddress = contact.wallet_address
+    if (this.currentMode === "normal") {
+      this.recipientAddress = contact.wallet_address
+    } else if (this.currentMode === "contract") {
+      this.contractRecipient = contact.wallet_address
+    }
+
     this.searchContactTerm = contact.name || this.formatAddress(contact.wallet_address)
     this.showContactsList = false
   }
@@ -183,186 +193,316 @@ export class TransactionComponent implements OnInit, OnDestroy {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
-  // Validar el formulario antes de mostrar el modal
-  validateForm(): boolean {
-    // Resetear mensaje de error
-    this.errorMessage = ""
+  // ===== MÉTODOS PARA SMART CONTRACTS =====
 
-    // Validar dirección - Verificar que sea una dirección Ethereum válida
-    if (!this.recipientAddress) {
-      // Si el usuario ingresó texto en el campo de búsqueda pero no seleccionó un contacto
-      if (this.searchContactTerm && this.searchContactTerm.startsWith("0x") && this.searchContactTerm.length === 42) {
-        // Usar la dirección ingresada directamente
-        this.recipientAddress = this.searchContactTerm
-      } else {
-        this.errorMessage = "Por favor, ingresa una dirección de wallet válida"
-        return false
-      }
+  // Cargar balance del contrato
+  async loadContractBalance(): Promise<void> {
+    if (!this.contractAddress) {
+      this.notificationService.showError("Por favor, ingresa una dirección de contrato")
+      return
     }
 
-    // Verificar formato de dirección Ethereum
-    if (!this.recipientAddress.startsWith("0x") || this.recipientAddress.length !== 42) {
-      this.errorMessage = "Por favor, ingresa una dirección de wallet Ethereum válida (formato 0x...)"
+    if (!this.contractAddress.startsWith("0x") || this.contractAddress.length !== 42) {
+      this.notificationService.showError("Por favor, ingresa una dirección de contrato válida")
+      return
+    }
+    this.isLoadingContract = true
+    this.contractBalance = "0"
+    
+    try {
+      const isValid = await this.walletService.isValidContract(this.contractAddress)
+      if (!isValid) {
+        throw new Error("La dirección no es un contrato válido")
+      }
+
+      // Verificar si el contrato tiene el método sendPayment
+      const hasPaymentMethod = await this.walletService.hasPaymentMethod(this.contractAddress)
+      if (!hasPaymentMethod) {
+        this.notificationService.showInfo("El contrato no tiene el método sendPayment, pero puedes depositar ETH")
+      }
+
+      // Cargar el balance del contrato
+      const balance = await this.walletService.getContractBalance(this.contractAddress)
+      this.contractBalance = balance
+      
+      this.walletService.setContractAddress(this.contractAddress)
+      this.notificationService.showSuccess("Contrato cargado correctamente")
+      
+      console.log("Contract loaded:", {
+        address: this.contractAddress,
+        balance: this.contractBalance,
+        hasPaymentMethod: hasPaymentMethod
+      })
+      
+    } catch (error: any) {
+      console.error("Error loading contract:", error)
+      this.notificationService.showError(error.message || "Error al cargar el contrato")
+      this.contractBalance = "0"
+    } finally {
+      this.isLoadingContract = false
+    }
+  }
+
+  // Enviar pago desde contrato
+  async sendContractPayment(): Promise<void> {
+    if (!this.validateContractForm()) return
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    try {
+      // Verificar nuevamente que el contrato tenga fondos suficientes
+      const currentBalance = await this.walletService.getContractBalance(this.contractAddress)
+      if (Number.parseFloat(currentBalance) < Number.parseFloat(this.contractAmount)) {
+        throw new Error("El contrato no tiene fondos suficientes")
+      }
+
+      const transaction = await this.walletService.sendPaymentFromContract(
+        this.contractAddress,
+        this.contractRecipient,
+        this.contractAmount,
+        this.contractGasPrice,
+      )
+
+      this.transactionHash = transaction.hash
+      this.notificationService.showSuccess("¡Pago desde contrato enviado correctamente!")
+
+      // Esperar confirmación
+      try {
+        await transaction.wait()
+        this.notificationService.showSuccess("¡Transacción confirmada!")
+        
+        // Actualizar balance del contrato después de la confirmación
+        setTimeout(async () => {
+          await this.loadContractBalance()
+        }, 2000)
+        
+      } catch (err) {
+        console.warn("No se pudo confirmar la transacción:", err)
+      }
+
+      await this.walletService.refreshBalance()
+
+      this.showSuccessModal = true
+    } catch (error: any) {
+      console.error("Error sending contract payment:", error)
+      this.errorMessage = error.message || "Error al enviar el pago desde el contrato"
+      this.notificationService.showError(this.errorMessage)
+    } finally {
+      this.isLoading = false
+    }
+  }
+
+  // ===== MÉTODOS PARA GESTIÓN DE CONTRATOS =====
+
+  // Cargar contrato para gestión
+  async loadManageContract(): Promise<void> {
+    if (!this.manageContractAddress) {
+      this.notificationService.showError("Por favor, ingresa una dirección de contrato")
+      return
+    }
+
+    if (!this.manageContractAddress.startsWith("0x") || this.manageContractAddress.length !== 42) {
+      this.notificationService.showError("Por favor, ingresa una dirección de contrato válida")
+      return
+    }
+    this.isLoadingManage = true
+    this.manageContractBalance = "0"
+    
+    try {
+      const isValid = await this.walletService.isValidContract(this.manageContractAddress)
+      if (!isValid) {
+        throw new Error("La dirección no es un contrato válido")
+      }
+
+      const balance = await this.walletService.getContractBalance(this.manageContractAddress)
+      this.manageContractBalance = balance
+      this.notificationService.showSuccess("Contrato cargado para gestión")
+      
+      console.log("Manage contract loaded:", {
+        address: this.manageContractAddress,
+        balance: this.manageContractBalance
+      })
+      
+    } catch (error: any) {
+      console.error("Error loading manage contract:", error)
+      this.notificationService.showError(error.message || "Error al cargar el contrato")
+      this.manageContractBalance = "0"
+    } finally {
+      this.isLoadingManage = false
+    }
+  }
+
+  // Depositar en contrato
+  async depositToContract(): Promise<void> {
+    if (!this.validateDepositForm()) return
+
+    this.isLoading = true
+    this.errorMessage = ""
+
+    try {
+      // Verificar que el usuario tenga fondos suficientes
+      const userBalance = await this.walletService.getProvider()?.getBalance(this.currentWallet)
+      if (userBalance) {
+        const userBalanceEth = Number.parseFloat(formatEther(userBalance))
+        const depositAmountEth = Number.parseFloat(this.depositAmount)
+        
+        if (userBalanceEth < depositAmountEth) {
+          throw new Error("No tienes fondos suficientes para realizar este depósito")
+        }
+      }
+
+      const transaction = await this.walletService.depositToContract(
+        this.manageContractAddress,
+        this.depositAmount,
+        this.depositGasPrice,
+      )
+
+      this.transactionHash = transaction.hash
+      this.notificationService.showSuccess("¡Depósito al contrato enviado correctamente!")
+
+      // Esperar confirmación
+      try {
+        await transaction.wait()
+        this.notificationService.showSuccess("¡Depósito confirmado!")
+        
+        // Actualizar balance del contrato después de la confirmación
+        setTimeout(async () => {
+          await this.loadManageContract()
+        }, 2000)
+        
+      } catch (err) {
+        console.warn("No se pudo confirmar el depósito:", err)
+      }
+
+      await this.walletService.refreshBalance()
+
+      this.showSuccessModal = true
+    } catch (error: any) {
+      console.error("Error depositing to contract:", error)
+      this.errorMessage = error.message || "Error al depositar en el contrato"
+      this.notificationService.showError(this.errorMessage)
+    } finally {
+      this.isLoading = false
+    }
+  }
+
+  // ===== VALIDACIONES =====
+
+  validateForm(): boolean {
+    this.errorMessage = ""
+
+    if (this.searchContactTerm && this.searchContactTerm.startsWith("0x") && this.searchContactTerm.length === 42) {
+      this.recipientAddress = this.searchContactTerm
+    }
+
+    if (!this.recipientAddress) {
+      this.errorMessage = "Por favor, ingresa una dirección de wallet válida"
       return false
     }
 
-    // Validar cantidad
+    if (!this.recipientAddress.startsWith("0x") || this.recipientAddress.length !== 42) {
+      this.errorMessage = "Por favor, ingresa una dirección de wallet Ethereum válida"
+      return false
+    }
+
     if (!this.amount || Number.parseFloat(this.amount) <= 0) {
       this.errorMessage = "Por favor, ingresa una cantidad válida"
       return false
     }
 
-    // Validar gas
     if (!this.gasPrice || Number.parseFloat(this.gasPrice) <= 0) {
       this.errorMessage = "Por favor, ingresa un precio de gas válido"
-      return false
-    }
-
-    // Validar dirección del contrato si se usa el modo contrato
-    if (this.transactionType === "contract" && !this.contractAddress) {
-      this.errorMessage = "No hay dirección de contrato disponible para la red actual"
       return false
     }
 
     return true
   }
 
-  // Abrir modal de confirmación
+  validateContractForm(): boolean {
+    this.errorMessage = ""
+
+    if (!this.contractAddress) {
+      this.errorMessage = "Por favor, carga un contrato primero"
+      return false
+    }
+
+    if (!this.contractRecipient) {
+      this.errorMessage = "Por favor, ingresa una dirección de destinatario"
+      return false
+    }
+
+    if (!this.contractRecipient.startsWith("0x") || this.contractRecipient.length !== 42) {
+      this.errorMessage = "Por favor, ingresa una dirección de wallet Ethereum válida"
+      return false
+    }
+
+    if (!this.contractAmount || Number.parseFloat(this.contractAmount) <= 0) {
+      this.errorMessage = "Por favor, ingresa una cantidad válida"
+      return false
+    }
+
+    if (Number.parseFloat(this.contractAmount) > Number.parseFloat(this.contractBalance)) {
+      this.errorMessage = "La cantidad excede el balance del contrato"
+      return false
+    }
+
+    if (!this.contractGasPrice || Number.parseFloat(this.contractGasPrice) <= 0) {
+      this.errorMessage = "Por favor, ingresa un precio de gas válido"
+      return false
+    }
+
+    return true
+  }
+
+  validateDepositForm(): boolean {
+    this.errorMessage = ""
+
+    if (!this.manageContractAddress) {
+      this.errorMessage = "Por favor, carga un contrato primero"
+      return false
+    }
+
+    if (!this.depositAmount || Number.parseFloat(this.depositAmount) <= 0) {
+      this.errorMessage = "Por favor, ingresa una cantidad válida para depositar"
+      return false
+    }
+
+    if (!this.depositGasPrice || Number.parseFloat(this.depositGasPrice) <= 0) {
+      this.errorMessage = "Por favor, ingresa un precio de gas válido"
+      return false
+    }
+
+    return true
+  }
+
+  // ===== MÉTODOS DE UI =====
+
   openConfirmModal(): void {
-    if (this.validateForm()) {
+    if (this.currentMode === "normal" && this.validateForm()) {
+      this.showModal = true
+    } else if (this.currentMode === "contract" && this.validateContractForm()) {
       this.showModal = true
     }
   }
 
-  // Cerrar modal
   closeModal(): void {
     this.showModal = false
   }
 
-  // Modificar el método closeSuccessModal para mostrar notificación
   closeSuccessModal(): void {
     this.showSuccessModal = false
-    this.resetForm()
-    this.notificationService.showInfo("Puedes realizar otra transacción", 3000)
+    this.resetForms()
+    this.notificationService.showInfo("Puedes realizar otra operación")
   }
 
-  // Resetear formulario
-  resetForm(): void {
-    this.recipientAddress = ""
-    this.searchContactTerm = ""
-    this.amount = ""
-    this.gasPrice = "5"
-    this.note = ""
-    this.transactionHash = ""
-    this.transactionType = "normal"
+  onRecipientFocus(): void {
+    this.showContactsList = true
   }
 
-  // Modificar el método sendTransaction para mostrar notificaciones
-  async sendTransaction(): Promise<void> {
-    this.isLoading = true
-    this.errorMessage = ""
-
-    try {
-      const provider = this.walletService.getProvider()
-      if (!provider) throw new Error("No se pudo obtener el proveedor de wallet")
-
-      const signer = await provider.getSigner()
-      let transaction
-
-      if (this.transactionType === "normal") {
-        // Transferencia normal
-        const tx = {
-          to: this.recipientAddress.trim().toLowerCase(),
-          value: parseEther(this.amount),
-          gasPrice: parseUnits(this.gasPrice, "gwei"),
-        }
-
-        transaction = await signer.sendTransaction(tx)
-      } else {
-        // Transferencia usando contrato
-        if (!this.contractAddress) {
-          throw new Error("No hay dirección de contrato disponible para la red actual")
-        }
-
-        // Crear instancia del contrato
-        const contract = new Contract(this.contractAddress, contractAbi, signer)
-
-        // Llamar a la función sendPayment del contrato
-        transaction = await contract['sendPayment'](this.recipientAddress.trim().toLowerCase(), {
-          value: parseEther(this.amount),
-          gasPrice: parseUnits(this.gasPrice, "gwei"),
-        })
-      }
-
-      this.transactionHash = transaction.hash
-      this.showModal = false
-
-      // Mostrar notificación de transacción enviada
-      this.notificationService.showSuccess("¡Transacción enviada correctamente!", 5000)
-
-      // ✅ Intenta esperar confirmación, pero no lo obligues
-      try {
-        await transaction.wait()
-        // Mostrar notificación de transacción confirmada
-        this.notificationService.showSuccess("¡Transacción confirmada en la blockchain!", 5000)
-      } catch (err) {
-        console.warn("⚠️ No se pudo confirmar vía wait():", err)
-        // Aquí puedes esperar 5 segundos y reintentar si quieres
-        await new Promise((res) => setTimeout(res, 5000))
-        try {
-          await transaction.wait()
-          this.notificationService.showSuccess("¡Transacción confirmada en la blockchain!", 5000)
-        } catch (finalErr) {
-          console.warn("❌ Segundo intento fallido, pero continuamos")
-          this.notificationService.showInfo("Transacción enviada, pero aún no confirmada", 5000)
-        }
-      }
-
-      // ✅ Guarda el historial de ambas partes
-      await this.saveToHistory(transaction.hash, this.currentWallet, this.recipientAddress)
-      await this.saveToHistory(transaction.hash, this.recipientAddress, this.currentWallet, true)
-
-      this.showSuccessModal = true
-      await this.walletService.refreshBalance()
-    } catch (error: any) {
-      console.error("Error al enviar la transacción:", error)
-      this.errorMessage = error.message || "Error al enviar la transacción"
-      this.showModal = false
-      this.notificationService.showError(`Error: ${this.errorMessage}`, 5000)
-    } finally {
-      this.isLoading = false
-    }
-  }
-
-  // Guardar transacción en el historial
-  async saveToHistory(
-    txHash: string,
-    ownerWallet: string,
-    counterpartyWallet: string,
-    isReceived = false,
-  ): Promise<void> {
-    try {
-      // Determinar el tipo de transacción de manera explícita
-      const transactionType: "received" | "sent" = isReceived ? "received" : "sent"
-
-      // Crear el objeto de historial con todos los campos necesarios
-      const historyEntry = {
-        tx_hash: txHash,
-        from_address: isReceived ? counterpartyWallet : ownerWallet,
-        to_address: isReceived ? ownerWallet : counterpartyWallet,
-        amount: Number.parseFloat(this.amount),
-        note: this.note || undefined,
-        owner_wallet: ownerWallet,
-        timestamp: new Date().toISOString(),
-        type: transactionType, // Asegurarse de que el tipo esté explícitamente definido
-      }
-
-      // Guardar en el historial
-      await this.historyService.addHistory(historyEntry)
-
-      console.log(`Transacción guardada para ${ownerWallet} como ${transactionType}`)
-    } catch (error) {
-      console.error("Error al guardar en el historial:", error)
+  onClickOutside(event: Event): void {
+    if (!(event.target as HTMLElement).closest(".contact-search-container")) {
+      this.showContactsList = false
     }
   }
 
@@ -371,7 +511,6 @@ export class TransactionComponent implements OnInit, OnDestroy {
     navigator.clipboard
       .writeText(this.transactionHash)
       .then(() => {
-        // Feedback visual temporal
         const button = document.getElementById("copy-button")
         if (button) {
           button.textContent = "¡Copiado!"
@@ -387,7 +526,6 @@ export class TransactionComponent implements OnInit, OnDestroy {
   viewOnEtherscan(): void {
     let baseUrl = "https://etherscan.io/tx/"
 
-    // Ajustar URL según la red
     switch (this.currentNetwork) {
       case "Sepolia":
         baseUrl = "https://sepolia.etherscan.io/tx/"
@@ -409,15 +547,44 @@ export class TransactionComponent implements OnInit, OnDestroy {
     window.open(baseUrl + this.transactionHash, "_blank")
   }
 
-  // Mostrar lista de contactos al hacer clic en el campo
-  onRecipientFocus(): void {
-    this.showContactsList = true
-  }
+  // Enviar transacción normal (método existente simplificado)
+  async sendTransaction(): Promise<void> {
+    this.isLoading = true
+    this.errorMessage = ""
 
-  // Ocultar lista de contactos cuando se hace clic fuera
-  onClickOutside(event: Event): void {
-    if (!(event.target as HTMLElement).closest(".contact-search-container")) {
-      this.showContactsList = false
+    try {
+      const provider = this.walletService.getProvider()
+      if (!provider) throw new Error("No se pudo obtener el proveedor de wallet")
+
+      const signer = await provider.getSigner()
+      const tx = {
+        to: this.recipientAddress.trim().toLowerCase(),
+        value: parseEther(this.amount),
+        gasPrice: parseUnits(this.gasPrice, "gwei"),
+      }
+
+      const transaction = await signer.sendTransaction(tx)
+      this.transactionHash = transaction.hash
+      this.showModal = false
+
+      this.notificationService.showSuccess("¡Transacción enviada correctamente!")
+
+      try {
+        await transaction.wait()
+        this.notificationService.showSuccess("¡Transacción confirmada!")
+      } catch (err) {
+        console.warn("No se pudo confirmar la transacción:", err)
+      }
+
+      this.showSuccessModal = true
+      await this.walletService.refreshBalance()
+    } catch (error: any) {
+      console.error("Error al enviar la transacción:", error)
+      this.errorMessage = error.message || "Error al enviar la transacción"
+      this.showModal = false
+      this.notificationService.showError(this.errorMessage)
+    } finally {
+      this.isLoading = false
     }
   }
 }
